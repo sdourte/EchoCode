@@ -1,48 +1,59 @@
-import keyboard
-import pygame
 import os
+import json
+import pygame
+import keyboard
+import time
 
-# Initialisation du mixer pygame
-pygame.mixer.init()
+CONFIG_FILE = "settings.json"
 
-# Dossier des sons
-sound_folder = 'sounds'
+class EchoCodeListener:
+    def __init__(self):
+        self.config = self.load_config()
+        pygame.mixer.init()
+        self.sound_folder = 'sounds'
 
-# Dictionnaire des raccourcis clavier et leurs sons associés
-sound_map = {
-    'ctrl+c': os.path.join(sound_folder, 'copy.mp3'),
-    'ctrl+v': os.path.join(sound_folder, 'paste.mp3'),
-    'ctrl+z': os.path.join(sound_folder, 'undo.mp3'),
-    'ctrl+y': os.path.join(sound_folder, 'redo.mp3')
-}
+        self.sound_map = {
+            'ctrl+c': ('copy.mp3', 'sound_copy'),
+            'ctrl+v': ('paste.mp3', 'sound_paste'),
+            'ctrl+z': ('undo.mp3', 'sound_undo'),
+            'ctrl+y': ('redo.mp3', 'sound_redo'),
+        }
 
-# Dictionnaire pour suivre l'état des raccourcis
-shortcut_state = {shortcut: False for shortcut in sound_map.keys()}
+        self.shortcut_state = {shortcut: False for shortcut in self.sound_map}
 
-def play_sound(file):
-    """Fonction pour jouer un son."""
-    if os.path.exists(file):  # Vérifier si le fichier existe
-        sound = pygame.mixer.Sound(file)
-        sound.play()
-    else:
-        print(f"⚠️ Le fichier audio {file} est introuvable.")
+    def load_config(self):
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, 'r') as f:
+                return json.load(f)
+        return {}
 
-# Fonction principale pour écouter les raccourcis
-def listen_for_shortcuts():
-    print("🎧 En écoute des raccourcis clavier...")
+    def play_sound(self, filename):
+        path = os.path.join(self.sound_folder, filename)
+        if os.path.exists(path):
+            sound = pygame.mixer.Sound(path)
+            sound.play()
+        else:
+            print(f"⚠️ Fichier introuvable : {path}")
 
-    # Écouter en permanence les raccourcis
-    while True:
-        for shortcut in sound_map.keys():
-            if keyboard.is_pressed(shortcut):
-                # Si le raccourci n'a pas été déjà joué
-                if not shortcut_state[shortcut]:
-                    print(f"✅ Raccourci détecté : {shortcut.upper()}")
-                    play_sound(sound_map[shortcut])
-                    shortcut_state[shortcut] = True  # Marquer le raccourci comme joué
-            else:
-                # Quand la touche est relâchée, réinitialiser l'état
-                shortcut_state[shortcut] = False
+    def listen(self):
+        print("🎧 Écoute des raccourcis clavier...")
+
+        try:
+            while True:
+                for shortcut, (file, config_key) in self.sound_map.items():
+                    if self.config.get(config_key, False):
+                        if keyboard.is_pressed(shortcut):
+                            if not self.shortcut_state[shortcut]:
+                                print(f"✅ {shortcut.upper()} détecté")
+                                self.play_sound(file)
+                                self.shortcut_state[shortcut] = True
+                        else:
+                            self.shortcut_state[shortcut] = False
+
+                time.sleep(0.05)  # allège le CPU
+        except KeyboardInterrupt:
+            print("\n🛑 Arrêt manuel.")
 
 if __name__ == "__main__":
-    listen_for_shortcuts()
+    listener = EchoCodeListener()
+    listener.listen()
