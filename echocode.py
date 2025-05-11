@@ -1,59 +1,90 @@
+import keyboard
+import pygame
 import os
 import json
-import pygame
-import keyboard
 import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 CONFIG_FILE = "settings.json"
+SOUND_FOLDER = "sounds"
 
 class EchoCodeListener:
     def __init__(self):
-        self.config = self.load_config()
-        pygame.mixer.init()
-        self.sound_folder = 'sounds'
-
+        # Mapping raccourcis -> fichiers sons
         self.sound_map = {
-            'ctrl+c': ('copy.mp3', 'sound_copy'),
-            'ctrl+v': ('paste.mp3', 'sound_paste'),
-            'ctrl+z': ('undo.mp3', 'sound_undo'),
-            'ctrl+y': ('redo.mp3', 'sound_redo'),
+            'ctrl+c': os.path.join(SOUND_FOLDER, 'copy.mp3'),
+            'ctrl+v': os.path.join(SOUND_FOLDER, 'paste.mp3'),
+            'ctrl+z': os.path.join(SOUND_FOLDER, 'undo.mp3'),
+            'ctrl+y': os.path.join(SOUND_FOLDER, 'redo.mp3')
         }
 
-        self.shortcut_state = {shortcut: False for shortcut in self.sound_map}
+        # Mapping raccourcis -> clés de config
+        self.shortcut_config_keys = {
+            'ctrl+c': 'sound_copy',
+            'ctrl+v': 'sound_paste',
+            'ctrl+z': 'sound_undo',
+            'ctrl+y': 'sound_redo'
+        }
+
+        self.shortcut_state = {key: False for key in self.sound_map}
+        self.config = self.load_config()
+        pygame.mixer.init()
+        print("🎧 EchoCodeListener prêt.")
 
     def load_config(self):
         if os.path.exists(CONFIG_FILE):
-            with open(CONFIG_FILE, 'r') as f:
+            with open(CONFIG_FILE, "r") as f:
                 return json.load(f)
         return {}
 
-    def play_sound(self, filename):
-        path = os.path.join(self.sound_folder, filename)
-        if os.path.exists(path):
-            sound = pygame.mixer.Sound(path)
-            sound.play()
+    def reload_config(self):
+        print("🔄 Configuration mise à jour")
+        self.config = self.load_config()
+
+    def play_sound(self, file):
+        if os.path.exists(file):
+            pygame.mixer.Sound(file).play()
         else:
-            print(f"⚠️ Fichier introuvable : {path}")
+            print(f"⚠️ Fichier manquant : {file}")
 
-    def listen(self):
-        print("🎧 Écoute des raccourcis clavier...")
-
-        try:
-            while True:
-                for shortcut, (file, config_key) in self.sound_map.items():
-                    if self.config.get(config_key, False):
-                        if keyboard.is_pressed(shortcut):
-                            if not self.shortcut_state[shortcut]:
-                                print(f"✅ {shortcut.upper()} détecté")
-                                self.play_sound(file)
-                                self.shortcut_state[shortcut] = True
+    def handle_shortcuts(self):
+        while True:
+            for shortcut in self.sound_map:
+                if keyboard.is_pressed(shortcut):
+                    if not self.shortcut_state[shortcut]:
+                        config_key = self.shortcut_config_keys.get(shortcut)
+                        if config_key and self.config.get(config_key, False):
+                            print(f"🔊 {shortcut.upper()} détecté")
+                            self.play_sound(self.sound_map[shortcut])
                         else:
-                            self.shortcut_state[shortcut] = False
+                            print(f"🔇 {shortcut.upper()} ignoré (désactivé dans la config)")
+                        self.shortcut_state[shortcut] = True
+                else:
+                    self.shortcut_state[shortcut] = False
+            time.sleep(0.05)
 
-                time.sleep(0.05)  # allège le CPU
-        except KeyboardInterrupt:
-            print("\n🛑 Arrêt manuel.")
+class ConfigWatcher(FileSystemEventHandler):
+    def __init__(self, listener: EchoCodeListener):
+        self.listener = listener
+
+    def on_modified(self, event):
+        if event.src_path.endswith(CONFIG_FILE):
+            self.listener.reload_config()
+
+def main():
+    listener = EchoCodeListener()
+
+    # Démarrer le watcher de config
+    observer = Observer()
+    observer.schedule(ConfigWatcher(listener), ".", recursive=False)
+    observer.start()
+
+    try:
+        listener.handle_shortcuts()
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
 if __name__ == "__main__":
-    listener = EchoCodeListener()
-    listener.listen()
+    main()

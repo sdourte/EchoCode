@@ -1,7 +1,7 @@
 {
-  "sound_copy": true,
+  "sound_copy": false,
   "sound_paste": true,
   "sound_undo": true,
   "sound_redo": true,
-  "sound_terminal_done": true
+  "sound_terminal_done": false
 }
