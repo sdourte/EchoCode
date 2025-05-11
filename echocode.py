@@ -16,7 +16,8 @@ class EchoCodeListener:
             'ctrl+c': os.path.join(SOUND_FOLDER, 'copy.mp3'),
             'ctrl+v': os.path.join(SOUND_FOLDER, 'paste.mp3'),
             'ctrl+z': os.path.join(SOUND_FOLDER, 'undo.mp3'),
-            'ctrl+y': os.path.join(SOUND_FOLDER, 'redo.mp3')
+            'ctrl+y': os.path.join(SOUND_FOLDER, 'redo.mp3'),
+            'ctrl+s': os.path.join(SOUND_FOLDER, 'save.mp3')
         }
 
         # Mapping raccourcis -> clés de config
@@ -24,7 +25,8 @@ class EchoCodeListener:
             'ctrl+c': 'sound_copy',
             'ctrl+v': 'sound_paste',
             'ctrl+z': 'sound_undo',
-            'ctrl+y': 'sound_redo'
+            'ctrl+y': 'sound_redo',
+            'ctrl+s': 'sound_save'
         }
 
         self.shortcut_state = {key: False for key in self.sound_map}

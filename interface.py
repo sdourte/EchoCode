@@ -10,7 +10,7 @@ default_config = {
     "sound_paste": True,
     "sound_undo": True,
     "sound_redo": True,
-    "sound_terminal_done": True
+    "sound_save": True
 }
 
 class EchoCodeConfigGUI:
