@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Echo To-Do</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    .done { text-decoration: line-through; color: gray; }
+    select { margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h2>📋 Liste de tâches EchoCode</h2>
+  <input type="text" id="taskInput" placeholder="Nouvelle tâche..." onkeydown="handleEnter(event)" />
+  <button onclick="addTask()">Ajouter</button>
+  <ul id="taskList"></ul>
+
+  <script>
+    const vscode = acquireVsCodeApi();
+    let tasks = [];
+
+    // Fonction pour afficher la liste de tâches
+    function render() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+
+      tasks.forEach((task, index) => {
+        const li = document.createElement("li");
+        li.className = task.status === "Terminée" ? "done" : "";
+
+        const statusSelect = document.createElement("select");
+        ["À faire", "En cours", "Terminée"].forEach(status => {
+          const option = document.createElement("option");
+          option.value = status;
+          option.textContent = status;
+          if (task.status === status) option.selected = true;
+          statusSelect.appendChild(option);
+        });
+
+        // Changer le statut de la tâche
+        statusSelect.onchange = () => {
+          const previousStatus = tasks[index].status;
+          tasks[index].status = statusSelect.value;
+          render();
+
+          // Si la tâche devient terminée, on envoie un message à l'extension pour jouer le son
+          if (statusSelect.value === "Terminée" && previousStatus !== "Terminée") {
+            vscode.postMessage({ command: "taskCompleted", task: task.text });
+          }
+        };
+
+        const taskText = document.createTextNode(task.text);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "❌";
+        deleteButton.onclick = () => removeTask(index);
+
+        li.appendChild(taskText);
+        li.appendChild(statusSelect);
+        li.appendChild(deleteButton);
+        list.appendChild(li);
+      });
+    }
+
+    // Ajouter une tâche
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      if (input.value.trim() === "") return;
+      tasks.push({ text: input.value, status: "À faire" });
+      input.value = "";
+      render();
+    }
+
+    // Supprimer une tâche
+    function removeTask(index) {
+      tasks.splice(index, 1);
+      render();
+    }
+
+    // Permet d'ajouter une tâche en appuyant sur "Entrée"
+    function handleEnter(event) {
+      if (event.key === "Enter") {
+        addTask();
+      }
+    }
+
+    // Initialiser l'affichage
+    render();
+  </script>
+</body>
+</html>
