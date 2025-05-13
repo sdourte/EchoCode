@@ -3,6 +3,7 @@ import pygame
 import os
 import json
 import time
+import sys
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -32,7 +33,7 @@ class EchoCodeListener:
         self.shortcut_state = {key: False for key in self.sound_map}
         self.config = self.load_config()
         pygame.mixer.init()
-        print("🎧 EchoCodeListener prêt.")
+        print("EchoCodeListener prêt.")
 
     def load_config(self):
         if os.path.exists(CONFIG_FILE):
@@ -41,15 +42,17 @@ class EchoCodeListener:
         return {}
 
     def reload_config(self):
-        print("🔄 Configuration mise à jour")
+        print("Configuration mise à jour")
         self.config = self.load_config()
-
+        
     def play_sound(self, file):
         if os.path.exists(file):
+            print(f"Lecture du son : {file}")
             pygame.mixer.Sound(file).play()
+            time.sleep(2)  # Laisser le temps au son de jouer (utile pour les appels directs)
         else:
-            print(f"⚠️ Fichier manquant : {file}")
-
+            print(f"Fichier manquant : {file}")
+        
     def handle_shortcuts(self):
         while True:
             for shortcut in self.sound_map:
@@ -57,10 +60,10 @@ class EchoCodeListener:
                     if not self.shortcut_state[shortcut]:
                         config_key = self.shortcut_config_keys.get(shortcut)
                         if config_key and self.config.get(config_key, False):
-                            print(f"🔊 {shortcut.upper()} détecté")
+                            print(f"{shortcut.upper()} détecté")
                             self.play_sound(self.sound_map[shortcut])
                         else:
-                            print(f"🔇 {shortcut.upper()} ignoré (désactivé dans la config)")
+                            print(f"{shortcut.upper()} ignoré (désactivé dans la config)")
                         self.shortcut_state[shortcut] = True
                 else:
                     self.shortcut_state[shortcut] = False
@@ -77,7 +80,18 @@ class ConfigWatcher(FileSystemEventHandler):
 def main():
     listener = EchoCodeListener()
 
-    # Démarrer le watcher de config
+    # Mode "commande directe"
+    if len(sys.argv) > 1:
+        command = sys.argv[1]
+        if command == "success":
+            script_dir = os.path.dirname(os.path.abspath(__file__))  # <-- le vrai dossier du script
+            success_file = os.path.join(script_dir, SOUND_FOLDER, 'success.mp3')
+            listener.play_sound(success_file)
+        else:
+            print(f"Commande inconnue : {command}")
+        return
+
+    # Mode écoute des raccourcis
     observer = Observer()
     observer.schedule(ConfigWatcher(listener), ".", recursive=False)
     observer.start()
@@ -87,6 +101,7 @@ def main():
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
+    pygame.quit()
 
 if __name__ == "__main__":
     main()

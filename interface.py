@@ -32,7 +32,7 @@ class EchoCodeConfigGUI:
         """Appelé à chaque changement d’état d’une checkbox"""
         self.config[key] = self.variables[key].get()
         self.save_config()
-        print(f"💾 Sauvegarde auto : {key} = {self.config[key]}")
+        print(f"Sauvegarde auto : {key} = {self.config[key]}")
 
     def create_gui(self):
         self.root = tk.Tk()
