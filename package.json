@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "echocode.helloWorld",
-        "title": "Hello World"
+        "command": "echocode.start",
+        "title": "Start EchoCode"
       }
     ],
     "keybindings": [
