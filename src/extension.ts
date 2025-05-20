@@ -1,6 +1,45 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
+
+let soundWebviewPanel: vscode.WebviewPanel | undefined;
+
+function createOrShowSoundWebView(context: vscode.ExtensionContext) {
+	if (soundWebviewPanel) {
+		return;
+	}
+
+	soundWebviewPanel = vscode.window.createWebviewPanel(
+		'echocodeSoundPlayer',
+		'Sound Player',
+		vscode.ViewColumn.Beside,
+		{
+			enableScripts: true,
+			localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, 'media'))],
+			retainContextWhenHidden: true
+		}
+	);
+
+	const htmlPath = path.join(context.extensionPath, 'src', 'webview', 'soundPlayer.html');
+	let html = fs.readFileSync(htmlPath, 'utf8');
+
+	html = html.replace(/vscode-resource:media\//g, soundWebviewPanel.webview.asWebviewUri(
+		vscode.Uri.file(path.join(context.extensionPath, 'media'))).toString() + '/');
+
+	soundWebviewPanel.webview.html = html;
+
+	soundWebviewPanel.onDidDispose(() => {
+		soundWebviewPanel = undefined;
+	});
+}
+
+function playSoundWebview(sound: string) {
+	if (soundWebviewPanel) {
+		soundWebviewPanel.webview.postMessage({ sound });
+	}
+}
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -17,22 +56,28 @@ export function activate(context: vscode.ExtensionContext) {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from EchoCode!');
+		createOrShowSoundWebView(context);
 	});
 
 	const printCtrlC = vscode.commands.registerCommand('echocode.printCtrlC', () => {
 		vscode.window.showInformationMessage('CTRL+C');
+		playSoundWebview('copy');
 	});
 	const printCtrlV = vscode.commands.registerCommand('echocode.printCtrlV', () => {
 		vscode.window.showInformationMessage('CTRL+V');
+		playSoundWebview('paste');
 	});
 	const printCtrlS = vscode.commands.registerCommand('echocode.printCtrlS', () => {
 		vscode.window.showInformationMessage('CTRL+S');
+		playSoundWebview('save');
 	});
 	const printCtrlZ = vscode.commands.registerCommand('echocode.printCtrlZ', () => {
 		vscode.window.showInformationMessage('CTRL+Z');
+		playSoundWebview('undo');
 	});
 	const printCtrlY = vscode.commands.registerCommand('echocode.printCtrlY', () => {
 		vscode.window.showInformationMessage('CTRL+Y');
+		playSoundWebview('redo');
 	});
 
 	// All the commands added to the command palette

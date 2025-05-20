@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sound Player</title>
+</head>
+<body>
+  <script>
+    const vscode = acquireVsCodeApi();
+
+    const sounds = {};
+
+    window.addEventListener('message', event => {
+      const { sound } = event.data;
+      if (!sound) return;
+
+      // Reuse cached Audio or create new
+      if (!sounds[sound]) {
+        const audio = new Audio(`vscode-resource:media/${sound}.mp3`);
+        sounds[sound] = audio;
+      }
+      sounds[sound].currentTime = 0;
+      sounds[sound].play();
+    });
+  </script>
+</body>
+</html>
