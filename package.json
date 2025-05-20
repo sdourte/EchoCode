@@ -1,0 +1,63 @@
+{
+  "name": "echocode",
+  "displayName": "EchoCode",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "echocode.helloWorld",
+        "title": "Hello World"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "echocode.printCtrlC",
+        "key": "ctrl+c"
+      },
+      {
+        "command": "echocode.printCtrlV",
+        "key": "ctrl+v"
+      },
+      {
+        "command": "echocode.printCtrlS",
+        "key": "ctrl+s"
+      },
+      {
+        "command": "echocode.printCtrlZ",
+        "key": "ctrl+z"
+      },
+      {
+        "command": "echocode.printCtrlY",
+        "key": "ctrl+y"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
