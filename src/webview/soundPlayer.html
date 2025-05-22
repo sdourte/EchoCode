@@ -16,7 +16,7 @@
 
       // Reuse cached Audio or create new
       if (!sounds[sound]) {
-        const audio = new Audio(`vscode-resource:media/${sound}.mp3`);
+        const audio = new Audio(`vscode-resource:media/${sound}`);
         sounds[sound] = audio;
       }
       sounds[sound].currentTime = 0;

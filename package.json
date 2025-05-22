@@ -50,6 +50,11 @@
         "command": "echocode.addShortcut",
         "title": "Ajouter un raccourci",
         "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.removeShortcut",
+        "title": "Supprimer le raccourci",
+        "category": "Sound Shortcut"
       }
 
     ],
@@ -78,30 +83,35 @@
     "menus": {
       "view/item/context": [
         {
-          "when": "view == soundShortcutsView && viewItem == soundItem",
+          "when": "view == soundExplorer && viewItem == soundItem",
           "command": "echocode.toggleEnabled",
           "group": "inline"
         },
         {
-          "when": "view == soundShortcutsView && viewItem == soundItem",
+          "when": "view == soundExplorer && viewItem == soundItem",
           "command": "echocode.increaseVolume",
           "group": "volume"
         },
         {
-          "when": "view == soundShortcutsView && viewItem == soundItem",
+          "when": "view == soundExplorer && viewItem == soundItem",
           "command": "echocode.decreaseVolume",
           "group": "volume"
         },
         {
-          "when": "view == soundShortcutsView && viewItem == soundItem",
+          "when": "view == soundExplorer && viewItem == soundItem",
           "command": "echocode.changeSound",
+          "group": "mod"
+        },
+        {
+          "when": "view == soundExplorer && viewItem == soundItem",
+          "command": "echocode.removeShortcut",
           "group": "mod"
         }
       ],
       "view/title": [
         {
           "command": "echocode.addShortcut",
-          "when": "view == soundShortcutsView",
+          "when": "view == soundExplorer",
           "group": "navigation"
         }
       ]

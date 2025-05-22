@@ -62,23 +62,23 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const printCtrlC = vscode.commands.registerCommand('echocode.printCtrlC', () => {
 		vscode.window.showInformationMessage('CTRL+C');
-		playSoundWebview('copy');
+		playSoundWebview('ctrlC.mp3');
 	});
 	const printCtrlV = vscode.commands.registerCommand('echocode.printCtrlV', () => {
 		vscode.window.showInformationMessage('CTRL+V');
-		playSoundWebview('paste');
+		playSoundWebview('ctrlV.mp3');
 	});
 	const printCtrlS = vscode.commands.registerCommand('echocode.printCtrlS', () => {
 		vscode.window.showInformationMessage('CTRL+S');
-		playSoundWebview('save');
+		playSoundWebview('ctrlS.mp3');
 	});
 	const printCtrlZ = vscode.commands.registerCommand('echocode.printCtrlZ', () => {
 		vscode.window.showInformationMessage('CTRL+Z');
-		playSoundWebview('undo');
+		playSoundWebview('ctrlZ.mp3');
 	});
 	const printCtrlY = vscode.commands.registerCommand('echocode.printCtrlY', () => {
 		vscode.window.showInformationMessage('CTRL+Y');
-		playSoundWebview('redo');
+		playSoundWebview('ctrlY.mp3');
 	});
 
 	const soundTreeDataProvider = new SoundTreeDataProvider();
@@ -113,7 +113,27 @@ export function activate(context: vscode.ExtensionContext) {
 			if (shortcut && soundFile) {
 				soundTreeDataProvider.addShortcut({ shortcut, soundFile, enabled: true, volume: 1 });
 			}
-		})
+		}),
+
+		vscode.commands.registerCommand('echocode.removeShortcut', async (item: SoundTreeItem) => {
+			if (!item) {return;}
+
+			const confirm = await vscode.window.showWarningMessage(
+				`Voulez-vous supprimer le raccourci "${item.shortcut}" ?`,
+				{ modal: true },
+				'Oui'
+			);
+
+			if (confirm === 'Oui') {
+				soundTreeDataProvider.removeShortcut(item.shortcut);
+				vscode.window.showInformationMessage(`Raccourci supprimé : ${item.shortcut}`);
+			}
+		}),
+
+		vscode.commands.registerCommand('echocode.playShortcutSound', (item: SoundTreeItem) => {
+			vscode.window.showInformationMessage(`🎵 ${item.shortcut} → ${item.soundFile}`);
+			playSoundWebview(item.soundFile); // Si tu utilises la WebView pour jouer
+		}),
 	];
 	// All the commands added to the command palette
 	const commands = [

@@ -21,6 +21,13 @@ export class SoundTreeItem extends vscode.TreeItem {
     this.description = `${soundFile} • ${enabled ? '🔊' : '🔇'} • ${Math.round(volume * 100)}%`;
     this.contextValue = 'soundItem';
     this.iconPath = new vscode.ThemeIcon(enabled ? 'unmute' : 'mute');
+
+	// Clic gauche = joue le son
+	this.command = {
+		command: 'echocode.playShortcutSound',
+		title: 'Play',
+		arguments: [this]
+	};
   }
 }
 
@@ -80,6 +87,11 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<SoundTreeI
   addShortcut(newShortcut: SoundShortcut) {
     this.shortcuts.push(newShortcut);
     this.refresh();
+  }
+
+  removeShortcut(shortcut: string) {
+	this.shortcuts = this.shortcuts.filter(s => s.shortcut !== shortcut);
+	this.refresh(); // si tu stockes dans un fichier
   }
 
   getShortcut(shortcut: string): SoundShortcut | undefined {
