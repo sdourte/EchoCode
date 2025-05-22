@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { SoundTreeDataProvider, SoundTreeItem } from './tree/soundView';
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
 
@@ -80,6 +81,40 @@ export function activate(context: vscode.ExtensionContext) {
 		playSoundWebview('redo');
 	});
 
+	const soundTreeDataProvider = new SoundTreeDataProvider();
+	vscode.window.registerTreeDataProvider('soundExplorer', soundTreeDataProvider);
+
+	const treeViewCommands = [
+		vscode.commands.registerCommand('echocode.toggleEnabled', (item: SoundTreeItem) => {
+			soundTreeDataProvider.toggleShortcut(item.shortcut);
+		}),
+
+		vscode.commands.registerCommand('echocode.increaseVolume', (item: SoundTreeItem) => {
+			soundTreeDataProvider.updateVolume(item.shortcut, item.volume + 0.1);
+		}),
+
+		vscode.commands.registerCommand('echocode.decreaseVolume', (item: SoundTreeItem) => {
+			soundTreeDataProvider.updateVolume(item.shortcut, item.volume - 0.1);
+		}),
+
+		vscode.commands.registerCommand('echocode.changeSound', async (item: SoundTreeItem) => {
+			const newFile = await vscode.window.showInputBox({
+				prompt: 'Nouveau nom de fichier son (ex: beep.mp3)',
+				value: item.soundFile
+			});
+			if (newFile) {
+				soundTreeDataProvider.updateSoundFile(item.shortcut, newFile);
+			}
+		}),
+
+		vscode.commands.registerCommand('echocode.addShortcut', async () => {
+			const shortcut = await vscode.window.showInputBox({ prompt: 'Raccourci (ex: Ctrl+Alt+M)' });
+			const soundFile = await vscode.window.showInputBox({ prompt: 'Nom du fichier son (ex: magic.mp3)' });
+			if (shortcut && soundFile) {
+				soundTreeDataProvider.addShortcut({ shortcut, soundFile, enabled: true, volume: 1 });
+			}
+		})
+	];
 	// All the commands added to the command palette
 	const commands = [
 		disposable,
@@ -87,7 +122,8 @@ export function activate(context: vscode.ExtensionContext) {
 		printCtrlV,
 		printCtrlS,
 		printCtrlZ,
-		printCtrlY
+		printCtrlY,
+		...treeViewCommands
 		];
 
 	for (const command of commands) {

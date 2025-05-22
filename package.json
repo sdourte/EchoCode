@@ -12,11 +12,46 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "soundExplorer",
+          "name": "Sound Explorer",
+          "icon": "media/icon.png"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "echocode.start",
         "title": "Start EchoCode"
+      },
+      {
+        "command": "echocode.toggleEnabled",
+        "title": "Activer/Désactiver le son",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.increaseVolume",
+        "title": "Augmenter le volume",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.decreaseVolume",
+        "title": "Diminuer le volume",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.changeSound",
+        "title": "Changer le fichier son",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.addShortcut",
+        "title": "Ajouter un raccourci",
+        "category": "Sound Shortcut"
       }
+
     ],
     "keybindings": [
       {
@@ -39,7 +74,38 @@
         "command": "echocode.printCtrlY",
         "key": "ctrl+y"
       }
-    ]
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "when": "view == soundShortcutsView && viewItem == soundItem",
+          "command": "echocode.toggleEnabled",
+          "group": "inline"
+        },
+        {
+          "when": "view == soundShortcutsView && viewItem == soundItem",
+          "command": "echocode.increaseVolume",
+          "group": "volume"
+        },
+        {
+          "when": "view == soundShortcutsView && viewItem == soundItem",
+          "command": "echocode.decreaseVolume",
+          "group": "volume"
+        },
+        {
+          "when": "view == soundShortcutsView && viewItem == soundItem",
+          "command": "echocode.changeSound",
+          "group": "mod"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "echocode.addShortcut",
+          "when": "view == soundShortcutsView",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
