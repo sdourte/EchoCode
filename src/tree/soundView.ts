@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
+
+const SHORTCUTS_FILE = path.join(__dirname, '..', 'shortcuts.json');
 
 export interface SoundShortcut {
   shortcut: string;
@@ -7,6 +10,8 @@ export interface SoundShortcut {
   enabled: boolean;
   volume: number; // 0 to 1
 }
+
+type SoundShortcutData = SoundShortcut;
 
 export class SoundTreeItem extends vscode.TreeItem {
   constructor(
@@ -22,12 +27,12 @@ export class SoundTreeItem extends vscode.TreeItem {
     this.contextValue = 'soundItem';
     this.iconPath = new vscode.ThemeIcon(enabled ? 'unmute' : 'mute');
 
-	// Clic gauche = joue le son
-	this.command = {
-		command: 'echocode.playShortcutSound',
-		title: 'Play',
-		arguments: [this]
-	};
+    // Clic gauche = joue le son
+    this.command = {
+      command: 'echocode.playShortcutSound',
+      title: 'Play',
+      arguments: [this]
+    };
   }
 }
 
@@ -38,14 +43,8 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<SoundTreeI
   private shortcuts: SoundShortcut[];
 
   constructor() {
-    // Tu peux démarrer avec quelques exemples
-    this.shortcuts = [
-      { shortcut: 'Ctrl+C', soundFile: 'ctrlC.mp3', enabled: true, volume: 1 },
-      { shortcut: 'Ctrl+V', soundFile: 'ctrlV.mp3', enabled: true, volume: 1 },
-	  { shortcut: 'Ctrl+Z', soundFile: 'ctrlZ.mp3', enabled: true, volume: 1 },
-	  { shortcut: 'Ctrl+Y', soundFile: 'ctrlY.mp3', enabled: true, volume: 1 },
-	  { shortcut: 'Ctrl+S', soundFile: 'ctrlS.mp3', enabled: true, volume: 1 }
-    ];
+    this.shortcuts = [];
+    this.loadShortcuts();
   }
 
   refresh(): void {
@@ -57,13 +56,18 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<SoundTreeI
   }
 
   getChildren(): Thenable<SoundTreeItem[]> {
-    return Promise.resolve(this.shortcuts.map(s => new SoundTreeItem(s.shortcut, s.soundFile, s.enabled, s.volume)));
+    return Promise.resolve(
+      this.shortcuts.map(
+        s => new SoundTreeItem(s.shortcut, s.soundFile, s.enabled, s.volume)
+      )
+    );
   }
 
   toggleShortcut(shortcut: string) {
     const item = this.shortcuts.find(s => s.shortcut === shortcut);
     if (item) {
       item.enabled = !item.enabled;
+      this.saveShortcuts();
       this.refresh();
     }
   }
@@ -72,6 +76,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<SoundTreeI
     const item = this.shortcuts.find(s => s.shortcut === shortcut);
     if (item) {
       item.volume = Math.max(0, Math.min(1, newVolume));
+      this.saveShortcuts();
       this.refresh();
     }
   }
@@ -80,18 +85,21 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<SoundTreeI
     const item = this.shortcuts.find(s => s.shortcut === shortcut);
     if (item) {
       item.soundFile = newFile;
+      this.saveShortcuts();
       this.refresh();
     }
   }
 
-  addShortcut(newShortcut: SoundShortcut) {
-    this.shortcuts.push(newShortcut);
-    this.refresh();
+  addShortcut(data: SoundShortcutData) {
+    this.shortcuts.push(data);
+    this.saveShortcuts();
+    this._onDidChangeTreeData.fire();
   }
 
   removeShortcut(shortcut: string) {
-	this.shortcuts = this.shortcuts.filter(s => s.shortcut !== shortcut);
-	this.refresh(); // si tu stockes dans un fichier
+    this.shortcuts = this.shortcuts.filter(s => s.shortcut !== shortcut);
+    this.saveShortcuts();
+    this.refresh();
   }
 
   getShortcut(shortcut: string): SoundShortcut | undefined {
@@ -100,5 +108,25 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<SoundTreeI
 
   getAllShortcuts(): SoundShortcut[] {
     return this.shortcuts;
+  }
+
+  private loadShortcuts() {
+    if (fs.existsSync(SHORTCUTS_FILE)) {
+      try {
+        const data = fs.readFileSync(SHORTCUTS_FILE, 'utf-8');
+        this.shortcuts = JSON.parse(data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des raccourcis :', error);
+        this.shortcuts = [];
+      }
+    }
+  }
+
+  private saveShortcuts() {
+    try {
+      fs.writeFileSync(SHORTCUTS_FILE, JSON.stringify(this.shortcuts, null, 2));
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des raccourcis :', error);
+    }
   }
 }
