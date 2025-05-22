@@ -52,7 +52,7 @@
       },
       {
         "command": "echocode.addShortcut",
-        "title": "Ajouter un raccourci",
+        "title": "+ Ajouter un raccourci",
         "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
@@ -96,16 +96,6 @@
           "when": "view == soundExplorer && viewItem == soundItem",
           "command": "echocode.toggleEnabled",
           "group": "inline"
-        },
-        {
-          "when": "view == soundExplorer && viewItem == soundItem",
-          "command": "echocode.increaseVolume",
-          "group": "volume"
-        },
-        {
-          "when": "view == soundExplorer && viewItem == soundItem",
-          "command": "echocode.decreaseVolume",
-          "group": "volume"
         },
         {
           "when": "view == soundExplorer && viewItem == soundItem",
