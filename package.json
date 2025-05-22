@@ -29,34 +29,44 @@
       {
         "command": "echocode.toggleEnabled",
         "title": "Activer/Désactiver le son",
+        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.increaseVolume",
         "title": "Augmenter le volume",
+        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.decreaseVolume",
         "title": "Diminuer le volume",
+        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.changeSound",
         "title": "Changer le fichier son",
+        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.addShortcut",
         "title": "Ajouter un raccourci",
+        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.removeShortcut",
         "title": "Supprimer le raccourci",
+        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.playSoundFromShortcut",
+        "title": "Play sound from custom shortcut",
+        "category": "EchoCode"
       }
-
     ],
     "keybindings": [
       {

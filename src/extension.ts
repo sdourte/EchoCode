@@ -36,9 +36,14 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 	});
 }
 
-function playSoundWebview(sound: string) {
+function playSoundWebview(soundFile: string, enabled: boolean, volume: number) {
 	if (soundWebviewPanel) {
-		soundWebviewPanel.webview.postMessage({ sound });
+		if (enabled) {
+			soundWebviewPanel.webview.postMessage({ sound: soundFile, enabled, volume });
+		}
+		else {
+			vscode.window.showWarningMessage(`⛔ Le raccourci "${soundFile}" est désactivé.`);
+		}
 	}
 }
 
@@ -60,29 +65,18 @@ export function activate(context: vscode.ExtensionContext) {
 		createOrShowSoundWebView(context);
 	});
 
-	const printCtrlC = vscode.commands.registerCommand('echocode.printCtrlC', () => {
-		vscode.window.showInformationMessage('CTRL+C');
-		playSoundWebview('ctrlC.mp3');
-	});
-	const printCtrlV = vscode.commands.registerCommand('echocode.printCtrlV', () => {
-		vscode.window.showInformationMessage('CTRL+V');
-		playSoundWebview('ctrlV.mp3');
-	});
-	const printCtrlS = vscode.commands.registerCommand('echocode.printCtrlS', () => {
-		vscode.window.showInformationMessage('CTRL+S');
-		playSoundWebview('ctrlS.mp3');
-	});
-	const printCtrlZ = vscode.commands.registerCommand('echocode.printCtrlZ', () => {
-		vscode.window.showInformationMessage('CTRL+Z');
-		playSoundWebview('ctrlZ.mp3');
-	});
-	const printCtrlY = vscode.commands.registerCommand('echocode.printCtrlY', () => {
-		vscode.window.showInformationMessage('CTRL+Y');
-		playSoundWebview('ctrlY.mp3');
-	});
-
+	// Create the DataProvider for the tree view
 	const soundTreeDataProvider = new SoundTreeDataProvider();
 	vscode.window.registerTreeDataProvider('soundExplorer', soundTreeDataProvider);
+
+	const shortcutsCommand = vscode.commands.registerCommand('echocode.playSoundFromShortcut', (item: SoundTreeItem) => {
+			if (item) {
+				vscode.window.showInformationMessage(`🎵 ${item.shortcut}`);
+				playSoundWebview(item.soundFile, item.enabled, item.volume);
+			} else {
+				vscode.window.showErrorMessage(`Aucun raccourci trouvé pour ce raccourci.`);
+			}
+	});
 
 	const treeViewCommands = [
 		vscode.commands.registerCommand('echocode.toggleEnabled', (item: SoundTreeItem) => {
@@ -131,18 +125,18 @@ export function activate(context: vscode.ExtensionContext) {
 		}),
 
 		vscode.commands.registerCommand('echocode.playShortcutSound', (item: SoundTreeItem) => {
+			if (!item) {
+				vscode.window.showErrorMessage('Aucun élément sélectionné.');
+				return;
+			}
 			vscode.window.showInformationMessage(`🎵 ${item.shortcut} → ${item.soundFile}`);
-			playSoundWebview(item.soundFile); // Si tu utilises la WebView pour jouer
+			playSoundWebview(item.soundFile, item.enabled, item.volume); // Si tu utilises la WebView pour jouer
 		}),
 	];
 	// All the commands added to the command palette
 	const commands = [
 		disposable,
-		printCtrlC,
-		printCtrlV,
-		printCtrlS,
-		printCtrlZ,
-		printCtrlY,
+		shortcutsCommand,
 		...treeViewCommands
 		];
 

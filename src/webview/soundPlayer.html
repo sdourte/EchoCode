@@ -11,7 +11,8 @@
     const sounds = {};
 
     window.addEventListener('message', event => {
-      const { sound } = event.data;
+      const { sound, volume } = event.data;
+
       if (!sound) return;
 
       // Reuse cached Audio or create new
@@ -19,6 +20,7 @@
         const audio = new Audio(`vscode-resource:media/${sound}`);
         sounds[sound] = audio;
       }
+      sounds[sound].volume = volume;
       sounds[sound].currentTime = 0;
       sounds[sound].play();
     });
