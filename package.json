@@ -88,6 +88,10 @@
       {
         "command": "echocode.printCtrlY",
         "key": "ctrl+y"
+      },
+      {
+        "command": "echocode.printCtrlA",
+        "key": "ctrl+a"
       }
     ],
     "menus": {

@@ -69,57 +69,28 @@ export function activate(context: vscode.ExtensionContext) {
 	const soundTreeDataProvider = new SoundTreeDataProvider();
 	vscode.window.registerTreeDataProvider('soundExplorer', soundTreeDataProvider);
 
-	const shortcutsCommands = [
-		vscode.commands.registerCommand('echocode.printCtrlC', () => {
-			const item = soundTreeDataProvider.getShortcut('Ctrl+C');
-			if (item) {
-				vscode.window.showInformationMessage('CTRL+C');
-				playSoundWebview(item.soundFile, item.enabled, item.volume);
-			} else {
-				vscode.window.showErrorMessage('Shortcut "Ctrl+C" not found.');
-			}
-		}),
+	// Dynamically register a command for each shortcut found in shortcuts.json
+	const shortcuts = soundTreeDataProvider.getAllShortcuts();
+	const dynamicShortcutCommands = shortcuts.map((item) => {
+		const normalized = item.shortcut
+			.replace(/\+/g, '')
+			.replace(/\s/g, '')
+			.replace(/-/g, '')
+			.replace(/[^a-zA-Z0-9]/g, '');
 
-		vscode.commands.registerCommand('echocode.printCtrlV', () => {
-			const item = soundTreeDataProvider.getShortcut('Ctrl+V');
-			if (item) {
-				vscode.window.showInformationMessage('CTRL+V');
-				playSoundWebview(item.soundFile, item.enabled, item.volume);
-			} else {
-				vscode.window.showErrorMessage('Shortcut "Ctrl+V" not found.');
-			}
-		}),
+		const commandId = `echocode.print${normalized}`;
 
-		vscode.commands.registerCommand('echocode.printCtrlS', () => {
-			const item = soundTreeDataProvider.getShortcut('Ctrl+S');
-			if (item) {
-				vscode.window.showInformationMessage('CTRL+S');
-				playSoundWebview(item.soundFile, item.enabled, item.volume);
-			} else {
-				vscode.window.showErrorMessage('Shortcut "Ctrl+S" not found.');
-			}
-		}),
+		console.log(`Registering command: ${commandId}`);
 
-		vscode.commands.registerCommand('echocode.printCtrlZ', () => {
-			const item = soundTreeDataProvider.getShortcut('Ctrl+Z');
-			if (item) {
-				vscode.window.showInformationMessage('CTRL+Z');
-				playSoundWebview(item.soundFile, item.enabled, item.volume);
-			} else {
-				vscode.window.showErrorMessage('Shortcut "Ctrl+Z" not found.');
-			}
-		}),
+		const command = vscode.commands.registerCommand(commandId, () => {
+			vscode.window.showInformationMessage(`🎵 ${item.shortcut} → ${item.soundFile}`);
+			playSoundWebview(item.soundFile, item.enabled, item.volume);
+		});
 
-		vscode.commands.registerCommand('echocode.printCtrlY', () => {
-			const item = soundTreeDataProvider.getShortcut('Ctrl+Y');
-			if (item) {
-				vscode.window.showInformationMessage('CTRL+Y');
-				playSoundWebview(item.soundFile, item.enabled, item.volume);
-			} else {
-				vscode.window.showErrorMessage('Shortcut "Ctrl+Y" not found.');
-			}
-		}),
-	];
+		context.subscriptions.push(command); // Ajout au contexte ici directement
+		return command;
+	});
+
 
 	const treeViewCommands = [
 		vscode.commands.registerCommand('echocode.toggleEnabled', (item: SoundTreeItem) => {
@@ -179,9 +150,8 @@ export function activate(context: vscode.ExtensionContext) {
 	// All the commands added to the command palette
 	const commands = [
 		disposable,
-		...shortcutsCommands,
-		...treeViewCommands
-		];
+		...treeViewCommands,
+	];
 
 	for (const command of commands) {
 		context.subscriptions.push(command);
