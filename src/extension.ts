@@ -4,8 +4,31 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { SoundTreeDataProvider, SoundTreeItem } from './tree/soundView';
+import { exec } from 'child_process';
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
+
+function updateKeybindings(context: vscode.ExtensionContext) {
+	// Chemin absolu vers le dossier de l'extension
+	const extensionRoot = context.extensionPath;
+
+	// Commande à exécuter : lancer ton script via npm run update:keybindings
+	const command = 'npm run update:keybindings';
+
+	// Exécute la commande dans le dossier de l'extension
+	exec(command, { cwd: extensionRoot }, (error, stdout, stderr) => {
+		if (error) {
+		console.error(`Erreur lors de la génération des keybindings : ${error.message}`);
+		vscode.window.showErrorMessage(`Erreur lors de la génération des keybindings : ${error.message}`);
+		return;
+		}
+		if (stderr) {
+		console.warn(`Warnings lors de la génération des keybindings : ${stderr}`);
+		}
+		console.log(`Keybindings générés : ${stdout}`);
+		vscode.window.showInformationMessage('Keybindings mis à jour avec succès !');		
+	});
+}
 
 function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 	if (soundWebviewPanel) {
@@ -125,7 +148,10 @@ export function activate(context: vscode.ExtensionContext) {
 			const soundFile = await vscode.window.showInputBox({ prompt: 'Nom du fichier son (ex: magic.mp3)' });
 			if (shortcut && soundFile) {
 				soundTreeDataProvider.addShortcut({ shortcut, soundFile, enabled: true, volume: 1 });
+				vscode.window.showInformationMessage(`Raccourci ajouté : ${shortcut}`);
 			}
+			updateKeybindings(context);
+			await new Promise(resolve => setTimeout(resolve, 10000));
 			// Recharger la fenêtre pour que les raccourcis soient à jour
 			vscode.commands.executeCommand('workbench.action.reloadWindow');
 		}),
@@ -143,6 +169,8 @@ export function activate(context: vscode.ExtensionContext) {
 				soundTreeDataProvider.removeShortcut(item.shortcut);
 				vscode.window.showInformationMessage(`Raccourci supprimé : ${item.shortcut}`);
 
+				updateKeybindings(context);
+				await new Promise(resolve => setTimeout(resolve, 6000));
 				// Recharger la fenêtre pour que les raccourcis soient à jour
 				vscode.commands.executeCommand('workbench.action.reloadWindow');
 			}

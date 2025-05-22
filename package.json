@@ -70,28 +70,24 @@
     ],
     "keybindings": [
       {
-        "command": "echocode.printCtrlC",
-        "key": "ctrl+c"
+        "key": "ctrl+c",
+        "command": "echocode.printCtrlC"
       },
       {
-        "command": "echocode.printCtrlV",
-        "key": "ctrl+v"
+        "key": "ctrl+v",
+        "command": "echocode.printCtrlV"
       },
       {
-        "command": "echocode.printCtrlS",
-        "key": "ctrl+s"
+        "key": "ctrl+s",
+        "command": "echocode.printCtrlS"
       },
       {
-        "command": "echocode.printCtrlZ",
-        "key": "ctrl+z"
+        "key": "ctrl+z",
+        "command": "echocode.printCtrlZ"
       },
       {
-        "command": "echocode.printCtrlY",
-        "key": "ctrl+y"
-      },
-      {
-        "command": "echocode.printCtrlA",
-        "key": "ctrl+a"
+        "key": "ctrl+y",
+        "command": "echocode.printCtrlY"
       }
     ],
     "menus": {
@@ -122,6 +118,8 @@
     }
   },
   "scripts": {
+    "precompile": "npm run update:keybindings",
+    "update:keybindings": "ts-node scripts/updateKeybindings.ts",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
@@ -138,6 +136,7 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.25.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
