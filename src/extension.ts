@@ -65,6 +65,9 @@ export function activate(context: vscode.ExtensionContext) {
 		createOrShowSoundWebView(context);
 	});
 
+	// Start the extension when it is activated
+	vscode.commands.executeCommand('echocode.start');
+
 	// Create the DataProvider for the tree view
 	const soundTreeDataProvider = new SoundTreeDataProvider();
 	vscode.window.registerTreeDataProvider('soundExplorer', soundTreeDataProvider);
@@ -137,6 +140,9 @@ export function activate(context: vscode.ExtensionContext) {
 			if (confirm === 'Oui') {
 				soundTreeDataProvider.removeShortcut(item.shortcut);
 				vscode.window.showInformationMessage(`Raccourci supprimé : ${item.shortcut}`);
+
+				// Recharger la fenêtre pour que les raccourcis soient à jour
+				vscode.commands.executeCommand('workbench.action.reloadWindow');
 			}
 		}),
 
