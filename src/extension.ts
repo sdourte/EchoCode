@@ -65,6 +65,8 @@ export function activate(context: vscode.ExtensionContext) {
 		createOrShowSoundWebView(context);
 	});
 
+	context.subscriptions.push(disposable);
+
 	// Start the extension when it is activated
 	vscode.commands.executeCommand('echocode.start');
 
@@ -157,7 +159,6 @@ export function activate(context: vscode.ExtensionContext) {
 	];
 	// All the commands added to the command palette
 	const commands = [
-		disposable,
 		...treeViewCommands,
 	];
 
