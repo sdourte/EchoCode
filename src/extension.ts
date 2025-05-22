@@ -121,6 +121,8 @@ export function activate(context: vscode.ExtensionContext) {
 			if (shortcut && soundFile) {
 				soundTreeDataProvider.addShortcut({ shortcut, soundFile, enabled: true, volume: 1 });
 			}
+			// Recharger la fenêtre pour que les raccourcis soient à jour
+			vscode.commands.executeCommand('workbench.action.reloadWindow');
 		}),
 
 		vscode.commands.registerCommand('echocode.removeShortcut', async (item: SoundTreeItem) => {
