@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { SoundTreeDataProvider, SoundTreeItem } from './tree/soundView';
 import { exec } from 'child_process';
+import { buildKeybindingMap, runDefaultCommandsForKey } from './scripts/keybindingMapper';
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
 
@@ -72,7 +73,7 @@ function playSoundWebview(soundFile: string, enabled: boolean, volume: number) {
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
@@ -99,6 +100,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Dynamically register a command for each shortcut found in shortcuts.json
 	const shortcuts = soundTreeDataProvider.getAllShortcuts();
+	// Build the keybinding map
+	const keybindingMap = await buildKeybindingMap();
+	console.log('Keybinding map:', keybindingMap);
 	const dynamicShortcutCommands = shortcuts.map((item) => {
 		const normalized = item.shortcut
 			.replace(/\+/g, '')
@@ -110,9 +114,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 		console.log(`Registering command: ${commandId}`);
 
-		const command = vscode.commands.registerCommand(commandId, () => {
+		const command = vscode.commands.registerCommand(commandId, async () => {
+
 			vscode.window.showInformationMessage(`🎵 ${item.shortcut} → ${item.soundFile}`);
 			playSoundWebview(item.soundFile, item.enabled, item.volume);
+			// Add default commands for the keybinding
+			await runDefaultCommandsForKey(item.shortcut, keybindingMap);
 		});
 
 		context.subscriptions.push(command); // Ajout au contexte ici directement

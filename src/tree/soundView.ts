@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-const SHORTCUTS_FILE = path.join(__dirname, '..', 'shortcuts.json');
+const SHORTCUTS_FILE = path.join(__dirname, '..', '..', 'out', 'shortcuts.json');
 
 export interface SoundShortcut {
 	shortcut: string;

@@ -1,6 +1,6 @@
+# Exclusions générales
 .vscode/**
 .vscode-test/**
-src/**
 .gitignore
 .yarnrc
 vsc-extension-quickstart.md
@@ -9,3 +9,11 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+
+# Réinclusions nécessaires (doivent être après les exclusions)
+!out/**
+!media/**
+!src/webview/soundPlayer.html
+!src/scripts/updateKeybindings.ts
+!src/tree/SoundView.ts
+!src/extension.ts
