@@ -119,7 +119,7 @@
   },
   "scripts": {
     "precompile": "npm run update:keybindings",
-    "update:keybindings": "ts-node scripts/updateKeybindings.ts",
+    "update:keybindings": "ts-node src/scripts/updateKeybindings.ts",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",

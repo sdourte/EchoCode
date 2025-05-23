@@ -3,8 +3,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const shortcutsPath = path.join(__dirname, '..', 'out', 'shortcuts.json');
-const packageJsonPath = path.join(__dirname, '..', 'package.json');
+const shortcutsPath = path.join(__dirname, '..', '..', 'out', 'shortcuts.json');
+const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
 
 const shortcuts = JSON.parse(fs.readFileSync(shortcutsPath, 'utf8'));
 const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
