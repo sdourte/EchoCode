@@ -9,15 +9,28 @@
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sdourte/EchoCode.git"
+  },
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "echocode",
+          "title": "EchoCode",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
     "views": {
-      "explorer": [
+      "echocode": [
         {
           "id": "soundExplorer",
-          "name": "Sound Explorer",
-          "icon": "media/icon.png"
+          "name": "Sound Shortcuts",
+          "icon": "media/icon.svg"
         }
       ]
     },
