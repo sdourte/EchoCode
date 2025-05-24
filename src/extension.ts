@@ -160,7 +160,12 @@ export async function activate(context: vscode.ExtensionContext) {
 			updateKeybindings(context);
 			await new Promise(resolve => setTimeout(resolve, 10000));
 			// Recharger la fenêtre pour que les raccourcis soient à jour
-			vscode.commands.executeCommand('workbench.action.reloadWindow');
+			if (soundWebviewPanel) {
+				vscode.window.showInformationMessage('Fermeture de la WebView');
+				soundWebviewPanel.dispose(); // Ferme explicitement la WebView
+			}
+			await vscode.commands.executeCommand('workbench.action.reloadWindow');
+
 		}),
 
 		vscode.commands.registerCommand('echocode.removeShortcut', async (item: SoundTreeItem) => {
@@ -179,7 +184,12 @@ export async function activate(context: vscode.ExtensionContext) {
 				updateKeybindings(context);
 				await new Promise(resolve => setTimeout(resolve, 6000));
 				// Recharger la fenêtre pour que les raccourcis soient à jour
-				vscode.commands.executeCommand('workbench.action.reloadWindow');
+				if (soundWebviewPanel) {
+					vscode.window.showInformationMessage('Fermeture de la WebView');
+					soundWebviewPanel.dispose(); // Ferme explicitement la WebView
+				}
+				await vscode.commands.executeCommand('workbench.action.reloadWindow');
+
 			}
 		}),
 
