@@ -55,6 +55,17 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 
 	soundWebviewPanel.webview.html = html;
 
+	// 🔁 Envoi de la liste des sons à précharger une fois
+	const allSounds = new Set<string>();
+	const shortcuts = new SoundTreeDataProvider().getAllShortcuts();
+	for (const s of shortcuts) {
+		if (s.soundFile) {allSounds.add(s.soundFile);}
+	}
+	soundWebviewPanel.webview.postMessage({
+		type: "init",
+		preloadSounds: Array.from(allSounds)
+	});
+
 	soundWebviewPanel.onDidDispose(() => {
 		soundWebviewPanel = undefined;
 	});

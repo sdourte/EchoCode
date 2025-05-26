@@ -7,22 +7,48 @@
 <body>
   <script>
     const vscode = acquireVsCodeApi();
-
     const sounds = {};
+    let interactionUnlocked = false;
+    let preloadSoundList = [];
 
-    window.addEventListener('message', event => {
-      const { sound, volume } = event.data;
+    // Débloque tous les sons au premier clic utilisateur
+    window.addEventListener('click', () => {
+      if (interactionUnlocked || preloadSoundList.length === 0) return;
+      interactionUnlocked = true;
+      console.log("🔓 Interaction utilisateur détectée, préchargement des sons...");
 
-      if (!sound) return;
-
-      // Reuse cached Audio or create new
-      if (!sounds[sound]) {
-        const audio = new Audio(`vscode-resource:media/${sound}`);
-        sounds[sound] = audio;
+      for (const filename of preloadSoundList) {
+        const audio = new Audio(`vscode-resource:media/${filename}`);
+        audio.volume = 0;
+        audio.play().catch(() => {});
+        sounds[filename] = audio;
       }
-      sounds[sound].volume = volume;
-      sounds[sound].currentTime = 0;
-      sounds[sound].play();
+    });
+
+    // Réception des messages depuis l'extension
+    window.addEventListener('message', event => {
+      const { type, sound, volume, enabled, preloadSounds } = event.data;
+
+      // Message d'initialisation : liste des sons à précharger
+      if (type === "init" && Array.isArray(preloadSounds)) {
+        preloadSoundList = preloadSounds;
+        console.log("📦 Sons à précharger :", preloadSoundList);
+        return;
+      }
+
+      // Lecture d'un son
+      if (!sound || !enabled) return;
+
+      if (!sounds[sound]) {
+        sounds[sound] = new Audio(`vscode-resource:media/${sound}`);
+      }
+
+      const audio = sounds[sound];
+      audio.volume = volume;
+      audio.currentTime = 0;
+      audio.play().catch(err => {
+        console.warn("🔇 Lecture bloquée (probablement sans clic utilisateur) :", err);
+      });
     });
   </script>
 </body>
