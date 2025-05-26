@@ -202,6 +202,28 @@ export async function activate(context: vscode.ExtensionContext) {
 			playSoundWebview(item.soundFile, item.enabled, item.volume); // Si tu utilises la WebView pour jouer
 		}),
 	];
+
+	// Suivi des terminaux EchoCode (simples)
+	const pythonTerminalMap = new Map<vscode.Terminal, boolean>();
+
+	vscode.window.onDidEndTerminalShellExecution((event) => {
+		console.log(`✅ Fin de l'exécution dans : ${event.terminal.name}`);
+		pythonTerminalMap.delete(event.terminal);
+
+		// Vérifie si l'exécution s'est terminée avec succès
+		const exitCode = event.exitCode;
+		const success = exitCode === 0;
+
+		console.log(`ℹ️ Code de sortie : ${exitCode} → ${success ? 'succès' : 'erreur'}`);
+
+		// Sélectionne le son approprié
+		const shortcut = soundTreeDataProvider.getShortcut(success ? 'RunSuccess' : 'RunError');
+		if (shortcut?.enabled) {
+			console.log(`🔊 Lecture de : ${shortcut.soundFile}`);
+			playSoundWebview(shortcut.soundFile, shortcut.enabled, shortcut.volume);
+		}
+	});
+
 	// All the commands added to the command palette
 	const commands = [
 		...treeViewCommands,

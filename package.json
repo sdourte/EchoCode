@@ -101,6 +101,14 @@
       {
         "key": "ctrl+y",
         "command": "echocode.printCtrlY"
+      },
+      {
+        "key": "runsuccess",
+        "command": "echocode.printRunSuccess"
+      },
+      {
+        "key": "runerror",
+        "command": "echocode.printRunError"
       }
     ],
     "menus": {
