@@ -74,41 +74,43 @@
         "title": "Supprimer le raccourci",
         "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
-      },
-      {
-        "command": "echocode.playSoundFromShortcut",
-        "title": "Play sound from custom shortcut",
-        "category": "EchoCode"
       }
     ],
     "keybindings": [
       {
         "key": "ctrl+c",
-        "command": "echocode.printCtrlC"
+        "command": "echocode.printCtrlC",
+        "when": "editorTextFocus"
       },
       {
         "key": "ctrl+v",
-        "command": "echocode.printCtrlV"
+        "command": "echocode.printCtrlV",
+        "when": "editorTextFocus"
       },
       {
         "key": "ctrl+s",
-        "command": "echocode.printCtrlS"
+        "command": "echocode.printCtrlS",
+        "when": "editorTextFocus"
       },
       {
         "key": "ctrl+z",
-        "command": "echocode.printCtrlZ"
+        "command": "echocode.printCtrlZ",
+        "when": "editorTextFocus"
       },
       {
         "key": "ctrl+y",
-        "command": "echocode.printCtrlY"
+        "command": "echocode.printCtrlY",
+        "when": "editorTextFocus"
       },
       {
         "key": "runsuccess",
-        "command": "echocode.printRunSuccess"
+        "command": "echocode.printRunSuccess",
+        "when": "editorTextFocus"
       },
       {
         "key": "runerror",
-        "command": "echocode.printRunError"
+        "command": "echocode.printRunError",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {

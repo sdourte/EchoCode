@@ -25,6 +25,7 @@ for (const s of shortcuts) {
   pkg.contributes.keybindings.push({
     key: s.shortcut.toLowerCase(),
     command: commandId,
+    when: 'editorTextFocus',
   });
 }
 
