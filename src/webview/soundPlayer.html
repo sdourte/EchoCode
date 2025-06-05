@@ -22,6 +22,7 @@
         audio.volume = 0;
         audio.play().catch(() => {});
         sounds[filename] = audio;
+        console.log(`🔊 Son préchargé : ${filename}`);
       }
     });
 

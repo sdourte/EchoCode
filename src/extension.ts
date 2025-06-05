@@ -50,9 +50,15 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 	soundWebviewPanel.webview.html = html;
 
 	const allSounds = new Set<string>();
-	const shortcuts = new SoundTreeDataProvider().getAllShortcuts();
-	for (const s of shortcuts) {
-		if (s.soundFile) { allSounds.add(s.soundFile); }
+	// Ajouter tous les sons du dossier media
+	const mediaFolder = path.join(context.extensionPath, 'media');
+	if (fs.existsSync(mediaFolder)) {
+		const files = fs.readdirSync(mediaFolder);
+		files.forEach(file => {
+			if (file.endsWith('.wav') || file.endsWith('.mp3')) {
+				allSounds.add(`${file}`);
+			}
+		});
 	}
 	soundWebviewPanel.webview.postMessage({
 		type: "init",
