@@ -96,6 +96,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// === SHORTCUT COMMANDS ===
 	const shortcuts = soundTreeDataProvider.getAllShortcuts();
 	const keybindingMap = await buildKeybindingMap();
+
 	const dynamicShortcutCommands = shortcuts.map((item) => {
 		const normalized = item.shortcut
 			.replace(/\+/g, '')
@@ -108,12 +109,23 @@ export async function activate(context: vscode.ExtensionContext) {
 		const command = vscode.commands.registerCommand(commandId, async () => {
 			vscode.window.showInformationMessage(`🎵 ${item.shortcut} → ${item.soundFile}`);
 			playSoundWebview(item.soundFile, item.enabled, item.volume);
-			await runDefaultCommandsForKey(item.shortcut, keybindingMap);
+
+			const shortcut = item.shortcut.toLowerCase().trim();
+			const editorCommand = keybindingMap[shortcut]?.find(cmd => cmd.includes("editor"));
+
+			if (editorCommand) {
+				console.log(`Commande liée à l'éditeur trouvée pour ${shortcut} : ${editorCommand}`);
+				await vscode.commands.executeCommand(editorCommand);
+			} else {
+				console.log(`Aucune commande liée à l'éditeur trouvée pour ${shortcut}, fallback général.`);
+				await runDefaultCommandsForKey(item.shortcut, keybindingMap);
+			}
 		});
 
 		context.subscriptions.push(command);
 		return command;
 	});
+
 
 	const treeViewCommands = [
 		vscode.commands.registerCommand('echocode.toggleEnabled', (item: SoundTreeItem) => {

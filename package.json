@@ -6,7 +6,9 @@
   "engines": {
     "vscode": "^1.100.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/sdourte/EchoCode.git"
@@ -38,28 +40,98 @@
       ]
     },
     "commands": [
-      { "command": "echocode.start", "title": "Start EchoCode" },
-      { "command": "echocode.toggleEnabled", "title": "Activer/Désactiver le son", "when": "viewItem == soundExplorer", "category": "Sound Shortcut" },
-      { "command": "echocode.increaseVolume", "title": "Augmenter le volume", "when": "viewItem == soundExplorer", "category": "Sound Shortcut" },
-      { "command": "echocode.decreaseVolume", "title": "Diminuer le volume", "when": "viewItem == soundExplorer", "category": "Sound Shortcut" },
-      { "command": "echocode.changeSound", "title": "Changer le fichier son", "when": "viewItem == soundExplorer", "category": "Sound Shortcut" },
-      { "command": "echocode.addShortcut", "title": "+ Ajouter un raccourci", "when": "viewItem == soundExplorer", "category": "Sound Shortcut" },
-      { "command": "echocode.removeShortcut", "title": "Supprimer le raccourci", "when": "viewItem == soundExplorer", "category": "Sound Shortcut" },
-
-      { "command": "echocode.playRunSound", "title": "Jouer un son post-run", "category": "Run Sound" },
-      { "command": "echocode.increaseRunVolume", "title": "Augmenter le volume post-run", "category": "Run Sound" },
-      { "command": "echocode.decreaseRunVolume", "title": "Diminuer le volume post-run", "category": "Run Sound" },
-      { "command": "echocode.toggleRunSound", "title": "Activer/Désactiver le son post-run", "category": "Run Sound" },
-      { "command": "echocode.changeRunSound", "title": "Changer le fichier son post-run", "category": "Run Sound" }
+      {
+        "command": "echocode.start",
+        "title": "Start EchoCode"
+      },
+      {
+        "command": "echocode.toggleEnabled",
+        "title": "Activer/Désactiver le son",
+        "when": "viewItem == soundExplorer",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.increaseVolume",
+        "title": "Augmenter le volume",
+        "when": "viewItem == soundExplorer",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.decreaseVolume",
+        "title": "Diminuer le volume",
+        "when": "viewItem == soundExplorer",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.changeSound",
+        "title": "Changer le fichier son",
+        "when": "viewItem == soundExplorer",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.addShortcut",
+        "title": "+ Ajouter un raccourci",
+        "when": "viewItem == soundExplorer",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.removeShortcut",
+        "title": "Supprimer le raccourci",
+        "when": "viewItem == soundExplorer",
+        "category": "Sound Shortcut"
+      },
+      {
+        "command": "echocode.playRunSound",
+        "title": "Jouer un son post-run",
+        "category": "Run Sound"
+      },
+      {
+        "command": "echocode.increaseRunVolume",
+        "title": "Augmenter le volume post-run",
+        "category": "Run Sound"
+      },
+      {
+        "command": "echocode.decreaseRunVolume",
+        "title": "Diminuer le volume post-run",
+        "category": "Run Sound"
+      },
+      {
+        "command": "echocode.toggleRunSound",
+        "title": "Activer/Désactiver le son post-run",
+        "category": "Run Sound"
+      },
+      {
+        "command": "echocode.changeRunSound",
+        "title": "Changer le fichier son post-run",
+        "category": "Run Sound"
+      }
     ],
     "keybindings": [
-      { "key": "ctrl+c", "command": "echocode.printCtrlC", "when": "!terminalFocus" },
-      { "key": "ctrl+v", "command": "echocode.printCtrlV", "when": "!terminalFocus" },
-      { "key": "ctrl+s", "command": "echocode.printCtrlS", "when": "!terminalFocus" },
-      { "key": "ctrl+z", "command": "echocode.printCtrlZ", "when": "!terminalFocus" },
-      { "key": "ctrl+y", "command": "echocode.printCtrlY", "when": "!terminalFocus" },
-      { "key": "runsuccess", "command": "echocode.printRunSuccess", "when": "!terminalFocus" },
-      { "key": "runerror", "command": "echocode.printRunError", "when": "!terminalFocus" }
+      {
+        "key": "ctrl+c",
+        "command": "echocode.printCtrlC",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+v",
+        "command": "echocode.printCtrlV",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+s",
+        "command": "echocode.printCtrlS",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+z",
+        "command": "echocode.printCtrlZ",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+y",
+        "command": "echocode.printCtrlY",
+        "when": "editorTextFocus"
+      }
     ],
     "menus": {
       "view/item/context": [
@@ -78,7 +150,6 @@
           "command": "echocode.removeShortcut",
           "group": "mod"
         },
-
         {
           "when": "view == runSounds && viewItem == runSoundItem",
           "command": "echocode.toggleRunSound",
