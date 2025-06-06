@@ -2,42 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sound Player</title>
+  <title>Sound Player & To-Do</title>
+  <style>
+    body { font-family: sans-serif; margin: 1rem; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 5px 0; }
+    input[type="text"] { margin-right: 5px; }
+  </style>
 </head>
 <body>
+  <h2>To-Do List</h2>
+  <ul id="task-list"></ul>
+  <div id="add-task">
+    <input type="text" id="new-task" placeholder="Nouvelle tâche..." />
+    <button onclick="addTask()">Ajouter</button>
+  </div>
+
   <script>
     const vscode = acquireVsCodeApi();
     const sounds = {};
     let interactionUnlocked = false;
     let preloadSoundList = [];
 
-    // Débloque tous les sons au premier clic utilisateur
+    // --- SONS ---
     window.addEventListener('click', () => {
       if (interactionUnlocked || preloadSoundList.length === 0) return;
       interactionUnlocked = true;
-      console.log("🔓 Interaction utilisateur détectée, préchargement des sons...");
-
       for (const filename of preloadSoundList) {
         const audio = new Audio(`vscode-resource:media/${filename}`);
         audio.volume = 0;
         audio.play().catch(() => {});
         sounds[filename] = audio;
-        console.log(`🔊 Son préchargé : ${filename}`);
       }
     });
 
-    // Réception des messages depuis l'extension
-    window.addEventListener('message', event => {
-      const { type, sound, volume, enabled, preloadSounds } = event.data;
+    // --- TODO ---
+    let mode = "editable";
+    let tasks = [];
 
-      // Message d'initialisation : liste des sons à précharger
-      if (type === "init" && Array.isArray(preloadSounds)) {
-        preloadSoundList = preloadSounds;
-        console.log("📦 Sons à précharger :", preloadSoundList);
+    function renderTasks() {
+      const list = document.getElementById("task-list");
+      list.innerHTML = "";
+      tasks.forEach((task, index) => {
+        const item = document.createElement("li");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.done;
+        checkbox.onchange = () => {
+          vscode.postMessage({ type: "toggleTask", index });
+        };
+
+        const label = document.createElement("span");
+        label.textContent = task.text;
+        if (task.done) label.style.textDecoration = "line-through";
+
+        item.appendChild(checkbox);
+        item.appendChild(label);
+        list.appendChild(item);
+      });
+
+      document.getElementById("add-task").style.display = (mode === "editable") ? "block" : "none";
+    }
+
+    function addTask() {
+      const input = document.getElementById("new-task");
+      const text = input.value.trim();
+      if (text) {
+        vscode.postMessage({ type: "addTask", text });
+        input.value = "";
+      }
+    }
+
+    // --- MESSAGES REÇUS ---
+    window.addEventListener('message', event => {
+      const { type, sound, volume, enabled, preloadSounds, todo } = event.data;
+
+      if (type === "init") {
+        if (Array.isArray(preloadSounds)) preloadSoundList = preloadSounds;
+        if (todo) {
+          mode = todo.mode;
+          tasks = todo.tasks;
+          renderTasks();
+        }
         return;
       }
 
-      // Lecture d'un son
+      if (type === "updateTasks") {
+        tasks = event.data.tasks;
+        renderTasks();
+        return;
+      }
+
       if (!sound || !enabled) return;
 
       if (!sounds[sound]) {
@@ -47,9 +103,7 @@
       const audio = sounds[sound];
       audio.volume = volume;
       audio.currentTime = 0;
-      audio.play().catch(err => {
-        console.warn("🔇 Lecture bloquée (probablement sans clic utilisateur) :", err);
-      });
+      audio.play().catch(err => {});
     });
   </script>
 </body>

@@ -5,6 +5,7 @@ import { SoundTreeDataProvider, SoundTreeItem } from './tree/soundView';
 import { RunSoundTreeDataProvider2, RunSoundTreeItem2, RunSoundType } from './tree/soundTerminal';
 import { exec } from 'child_process';
 import { buildKeybindingMap, runDefaultCommandsForKey } from './scripts/keybindingMapper';
+import { initializeTodo, getTasks, getMode, addTask, toggleTask } from './scripts/todo';
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
 
@@ -50,7 +51,6 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 	soundWebviewPanel.webview.html = html;
 
 	const allSounds = new Set<string>();
-	// Ajouter tous les sons du dossier media
 	const mediaFolder = path.join(context.extensionPath, 'media');
 	if (fs.existsSync(mediaFolder)) {
 		const files = fs.readdirSync(mediaFolder);
@@ -62,11 +62,39 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 	}
 	soundWebviewPanel.webview.postMessage({
 		type: "init",
-		preloadSounds: Array.from(allSounds)
+		preloadSounds: Array.from(allSounds),
+		todo: {
+			mode: getMode(),
+			tasks: getTasks()
+		}
 	});
 
 	soundWebviewPanel.onDidDispose(() => {
 		soundWebviewPanel = undefined;
+	});
+
+	soundWebviewPanel.webview.onDidReceiveMessage((message) => {
+		switch (message.type) {
+			case 'addTask':
+				if (getMode() === 'editable') {
+					addTask(message.text);
+					soundWebviewPanel?.webview.postMessage({
+						type: 'updateTasks',
+						tasks: getTasks()
+					});
+				}
+				break;
+
+			case 'toggleTask':
+				if (getMode() === 'editable') {
+					toggleTask(message.index);
+					soundWebviewPanel?.webview.postMessage({
+						type: 'updateTasks',
+						tasks: getTasks()
+					});
+				}
+				break;
+		}
 	});
 }
 
@@ -83,6 +111,8 @@ function playSoundWebview(soundFile: string, enabled: boolean, volume: number) {
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('EchoCode activé !');
 
+	initializeTodo(context);
+
 	const startDisposable = vscode.commands.registerCommand('echocode.start', () => {
 		vscode.window.showInformationMessage('Starting EchoCode!');
 		createOrShowSoundWebView(context);
@@ -91,15 +121,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.executeCommand('echocode.start');
 
-	// === SHORTCUTS TREE ===
 	const soundTreeDataProvider = new SoundTreeDataProvider();
 	vscode.window.registerTreeDataProvider('soundExplorer', soundTreeDataProvider);
 
-	// === RUN TREE ===
 	const runSoundProvider = new RunSoundTreeDataProvider2();
 	vscode.window.registerTreeDataProvider('runSounds', runSoundProvider);
 
-	// === SHORTCUT COMMANDS ===
 	const shortcuts = soundTreeDataProvider.getAllShortcuts();
 	const keybindingMap = await buildKeybindingMap();
 
@@ -131,7 +158,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		context.subscriptions.push(command);
 		return command;
 	});
-
 
 	const treeViewCommands = [
 		vscode.commands.registerCommand('echocode.toggleEnabled', (item: SoundTreeItem) => {
@@ -215,7 +241,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		})
 	];
 
-	// === TERMINAL LOGIC ===
 	vscode.window.onDidEndTerminalShellExecution((event) => {
 		const exitCode = event.exitCode;
 		const success = exitCode === 0;
@@ -227,7 +252,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		event.terminal.show(false);
 	});
 
-	// Enregistrement global
 	[...treeViewCommands, ...runSoundCommands].forEach(cmd => context.subscriptions.push(cmd));
 }
 
