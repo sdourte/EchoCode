@@ -5,7 +5,7 @@ import { SoundTreeDataProvider, SoundTreeItem } from './tree/soundView';
 import { RunSoundTreeDataProvider2, RunSoundTreeItem2, RunSoundType } from './tree/soundTerminal';
 import { exec } from 'child_process';
 import { buildKeybindingMap, runDefaultCommandsForKey } from './scripts/keybindingMapper';
-import { initializeTodo, getTasks, getMode, addTask, toggleTask, setMode } from './scripts/todo';
+import { initializeTodo, getTasks, getMode, addTask, toggleTask, updateTask, moveTask, deleteTask, setMode } from './scripts/todo';
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
 
@@ -23,6 +23,14 @@ function updateKeybindings(context: vscode.ExtensionContext) {
 		}
 		console.log(`Keybindings générés : ${stdout}`);
 		vscode.window.showInformationMessage('Keybindings mis à jour avec succès !');		
+	});
+}
+
+function updateWebview() {
+	soundWebviewPanel?.webview.postMessage({
+		type: 'updateTasks',
+		tasks: getTasks(),
+		mode: getMode()
 	});
 }
 
@@ -104,6 +112,37 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 					mode: getMode()
 				});
 				break;
+			
+			case 'updateTask':
+				if (getMode() === 'editable') {
+					updateTask(message.index, message.text);
+					soundWebviewPanel?.webview.postMessage({
+						type: 'updateTasks',
+						tasks: getTasks(),
+						mode: getMode()
+					});
+				}
+				break;
+
+			case 'deleteTask':
+				if (getMode() === 'editable') {
+					deleteTask(message.index);
+					updateWebview();
+				}
+				break;
+			case 'moveTaskUp':
+				if (getMode() === 'editable') {
+					moveTask(message.index, message.index - 1);
+					updateWebview();
+				}
+				break;
+			case 'moveTaskDown':
+				if (getMode() === 'editable') {
+					moveTask(message.index, message.index + 1);
+					updateWebview();
+				}
+				break;
+
 		}
 	});
 }

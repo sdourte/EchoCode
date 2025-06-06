@@ -6,10 +6,11 @@
   <style>
     body { font-family: sans-serif; margin: 1rem; }
     ul { list-style-type: none; padding: 0; }
-    li { margin: 5px 0; }
+    li { margin: 5px 0; display: flex; align-items: center; gap: 5px; }
     input[type="text"] { margin-right: 5px; }
     #header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     #mode-label { font-weight: bold; }
+    button { cursor: pointer; }
   </style>
 </head>
 <body>
@@ -37,6 +38,7 @@
     function renderTasks() {
       const list = document.getElementById("task-list");
       list.innerHTML = "";
+
       tasks.forEach((task, index) => {
         const item = document.createElement("li");
 
@@ -49,10 +51,59 @@
 
         const label = document.createElement("span");
         label.textContent = task.text;
+        label.style.marginRight = "10px";
         if (task.done) label.style.textDecoration = "line-through";
 
         item.appendChild(checkbox);
         item.appendChild(label);
+
+        if (mode === "editable") {
+          // Édition inline
+          const editButton = document.createElement("button");
+          editButton.textContent = "✏️";
+          editButton.onclick = () => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = task.text;
+
+            const saveBtn = document.createElement("button");
+            saveBtn.textContent = "💾";
+            saveBtn.onclick = () => {
+              const newText = input.value.trim();
+              if (newText && newText !== task.text) {
+                vscode.postMessage({ type: "updateTask", index, text: newText });
+              }
+            };
+
+            item.replaceChildren(checkbox, input, saveBtn);
+          };
+
+          // Suppression
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "🗑️";
+          deleteBtn.onclick = () => {
+            vscode.postMessage({ type: "deleteTask", index });
+          };
+
+          // Monter / Descendre
+          const upBtn = document.createElement("button");
+          upBtn.textContent = "🔼";
+          upBtn.onclick = () => {
+            vscode.postMessage({ type: "moveTaskUp", index });
+          };
+
+          const downBtn = document.createElement("button");
+          downBtn.textContent = "🔽";
+          downBtn.onclick = () => {
+            vscode.postMessage({ type: "moveTaskDown", index });
+          };
+
+          item.appendChild(editButton);
+          item.appendChild(deleteBtn);
+          item.appendChild(upBtn);
+          item.appendChild(downBtn);
+        }
+
         list.appendChild(item);
       });
 

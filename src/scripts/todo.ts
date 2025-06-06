@@ -77,6 +77,30 @@ export function toggleTask(index: number) {
   }
 }
 
+export function updateTask(index: number, text: string) {
+	if (mode !== 'editable') {return;}
+	if (index >= 0 && index < tasks.length) {
+		tasks[index].text = text;
+		saveTasksToFile();
+	}
+}
+
+export function deleteTask(index: number) {
+	if (mode !== 'editable') {return;}
+	if (index >= 0 && index < tasks.length) {
+		tasks.splice(index, 1);
+		saveTasksToFile();
+	}
+}
+
+export function moveTask(from: number, to: number) {
+	if (mode !== 'editable') {return;}
+	if (from < 0 || from >= tasks.length || to < 0 || to >= tasks.length) {return;}
+	const [moved] = tasks.splice(from, 1);
+	tasks.splice(to, 0, moved);
+	saveTasksToFile();
+}
+
 export function setMode(newMode: TodoMode) {
   console.log(`[TODO] Changement de mode : ${mode} → ${newMode}`);
   mode = newMode;
