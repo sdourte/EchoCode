@@ -8,15 +8,22 @@
     ul { list-style-type: none; padding: 0; }
     li { margin: 5px 0; }
     input[type="text"] { margin-right: 5px; }
+    #header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    #mode-label { font-weight: bold; }
   </style>
 </head>
 <body>
-  <h2>To-Do List</h2>
-  <ul id="task-list"></ul>
+  <div id="header">
+    <div id="mode-label">Mode : Classique</div>
+    <button onclick="switchMode()">Changer de mode</button>
+  </div>
+
   <div id="add-task">
     <input type="text" id="new-task" placeholder="Nouvelle tâche..." />
     <button onclick="addTask()">Ajouter</button>
   </div>
+
+  <ul id="task-list"></ul>
 
   <script>
     const vscode = acquireVsCodeApi();
@@ -24,19 +31,6 @@
     let interactionUnlocked = false;
     let preloadSoundList = [];
 
-    // --- SONS ---
-    window.addEventListener('click', () => {
-      if (interactionUnlocked || preloadSoundList.length === 0) return;
-      interactionUnlocked = true;
-      for (const filename of preloadSoundList) {
-        const audio = new Audio(`vscode-resource:media/${filename}`);
-        audio.volume = 0;
-        audio.play().catch(() => {});
-        sounds[filename] = audio;
-      }
-    });
-
-    // --- TODO ---
     let mode = "editable";
     let tasks = [];
 
@@ -62,6 +56,11 @@
         list.appendChild(item);
       });
 
+      // Mise à jour du titre selon le mode
+      const modeLabel = document.getElementById("mode-label");
+      modeLabel.textContent = `Mode : ${mode === 'editable' ? 'Classique' : 'Review'}`;
+
+      // Affichage de l'ajout uniquement en mode éditable
       document.getElementById("add-task").style.display = (mode === "editable") ? "block" : "none";
     }
 
@@ -74,7 +73,10 @@
       }
     }
 
-    // --- MESSAGES REÇUS ---
+    function switchMode() {
+      vscode.postMessage({ type: "switchMode" });
+    }
+
     window.addEventListener('message', event => {
       const { type, sound, volume, enabled, preloadSounds, todo } = event.data;
 
@@ -90,6 +92,7 @@
 
       if (type === "updateTasks") {
         tasks = event.data.tasks;
+        mode = event.data.mode || mode;
         renderTasks();
         return;
       }
@@ -103,7 +106,18 @@
       const audio = sounds[sound];
       audio.volume = volume;
       audio.currentTime = 0;
-      audio.play().catch(err => {});
+      audio.play().catch(() => {});
+    });
+
+    window.addEventListener('click', () => {
+      if (interactionUnlocked || preloadSoundList.length === 0) return;
+      interactionUnlocked = true;
+      for (const filename of preloadSoundList) {
+        const audio = new Audio(`vscode-resource:media/${filename}`);
+        audio.volume = 0;
+        audio.play().catch(() => {});
+        sounds[filename] = audio;
+      }
     });
   </script>
 </body>

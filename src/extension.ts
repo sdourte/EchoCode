@@ -5,7 +5,7 @@ import { SoundTreeDataProvider, SoundTreeItem } from './tree/soundView';
 import { RunSoundTreeDataProvider2, RunSoundTreeItem2, RunSoundType } from './tree/soundTerminal';
 import { exec } from 'child_process';
 import { buildKeybindingMap, runDefaultCommandsForKey } from './scripts/keybindingMapper';
-import { initializeTodo, getTasks, getMode, addTask, toggleTask } from './scripts/todo';
+import { initializeTodo, getTasks, getMode, addTask, toggleTask, setMode } from './scripts/todo';
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
 
@@ -80,19 +80,29 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 					addTask(message.text);
 					soundWebviewPanel?.webview.postMessage({
 						type: 'updateTasks',
-						tasks: getTasks()
+						tasks: getTasks(),
+						mode: getMode()
 					});
 				}
 				break;
 
 			case 'toggleTask':
-				if (getMode() === 'editable') {
-					toggleTask(message.index);
-					soundWebviewPanel?.webview.postMessage({
-						type: 'updateTasks',
-						tasks: getTasks()
-					});
-				}
+				toggleTask(message.index);  // Pas de condition ici
+				soundWebviewPanel?.webview.postMessage({
+					type: 'updateTasks',
+					tasks: getTasks(),
+					mode: getMode()
+				});
+				break;
+
+			case 'switchMode':
+				const newMode = getMode() === 'editable' ? 'review' : 'editable';
+				setMode(newMode);
+				soundWebviewPanel?.webview.postMessage({
+					type: 'updateTasks',
+					tasks: getTasks(),
+					mode: getMode()
+				});
 				break;
 		}
 	});
@@ -103,7 +113,7 @@ function playSoundWebview(soundFile: string, enabled: boolean, volume: number) {
 		if (enabled) {
 			soundWebviewPanel.webview.postMessage({ sound: soundFile, enabled, volume });
 		} else {
-			vscode.window.showWarningMessage(`⛔ Le son "${soundFile}" est désactivé.`);
+			vscode.window.showWarningMessage(`⛔ Le son \"${soundFile}\" est désactivé.`);
 		}
 	}
 }
