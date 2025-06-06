@@ -20,6 +20,13 @@
       flex-grow: 1;
     }
 
+    li.title-item {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #bbb;
+      padding: 6px 0;
+    }
+
     li button {
       background: none;
       border: none;
@@ -189,6 +196,9 @@
             }
           };
           item.appendChild(checkbox);
+        }
+        if (task.type === 'title') {
+          item.classList.add("title-item");
         }
 
         const label = document.createElement("span");
