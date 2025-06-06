@@ -4,24 +4,93 @@
   <meta charset="UTF-8">
   <title>Sound Player & To-Do</title>
   <style>
-    body { font-family: sans-serif; margin: 1rem; }
-    ul { list-style-type: none; padding: 0; }
-    li { margin: 5px 0; display: flex; align-items: center; gap: 5px; }
-    input[type="text"] { margin-right: 5px; }
-    #header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    #mode-label { font-weight: bold; }
-    button { cursor: pointer; }
+    body {
+      font-family: sans-serif;
+      margin: 1rem;
+    }
+
+    li {
+      margin: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    li span {
+      flex-grow: 1;
+    }
+
+    li button {
+      background: none;
+      border: none;
+      padding: 2px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #555;
+    }
+
+    li button:hover {
+      color: #000;
+    }
+
+    li input[type="text"] {
+      flex-grow: 1;
+    }
+
+    button.icon {
+      font-size: 16px;
+      background: none;
+      border: none;
+      padding: 4px;
+      margin: 0;
+      color: #444;
+      cursor: pointer;
+    }
+
+    #header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    #mode-label {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #ddd;
+    }
+
+    #switch-button {
+      background: none;
+      font-size: 2em;
+      cursor: pointer;
+      color: #444;
+      border: none;
+    }
+
+    #add-task {
+      margin-bottom: 16px;
+    }
+
+    #add-task input {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 1em;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background-color: #222;
+      color: white;
+    }
   </style>
 </head>
 <body>
   <div id="header">
     <div id="mode-label">Mode : Classique</div>
-    <button onclick="switchMode()">Changer de mode</button>
+    <button id="switch-button" onclick="switchMode()">🔄</button>
   </div>
 
   <div id="add-task">
     <input type="text" id="new-task" placeholder="Nouvelle tâche..." />
-    <button onclick="addTask()">Ajouter</button>
   </div>
 
   <ul id="task-list"></ul>
@@ -58,8 +127,8 @@
         item.appendChild(label);
 
         if (mode === "editable") {
-          // Édition inline
           const editButton = document.createElement("button");
+          editButton.className = "icon";
           editButton.textContent = "✏️";
           editButton.onclick = () => {
             const input = document.createElement("input");
@@ -70,7 +139,7 @@
             saveBtn.textContent = "💾";
             saveBtn.onclick = () => {
               const newText = input.value.trim();
-              if (newText && newText !== task.text) {
+              if (newText) {
                 vscode.postMessage({ type: "updateTask", index, text: newText });
               }
             };
@@ -78,21 +147,22 @@
             item.replaceChildren(checkbox, input, saveBtn);
           };
 
-          // Suppression
           const deleteBtn = document.createElement("button");
+          deleteBtn.className = "icon";
           deleteBtn.textContent = "🗑️";
           deleteBtn.onclick = () => {
             vscode.postMessage({ type: "deleteTask", index });
           };
 
-          // Monter / Descendre
           const upBtn = document.createElement("button");
+          upBtn.className = "icon";
           upBtn.textContent = "🔼";
           upBtn.onclick = () => {
             vscode.postMessage({ type: "moveTaskUp", index });
           };
 
           const downBtn = document.createElement("button");
+          downBtn.className = "icon";
           downBtn.textContent = "🔽";
           downBtn.onclick = () => {
             vscode.postMessage({ type: "moveTaskDown", index });
@@ -107,11 +177,9 @@
         list.appendChild(item);
       });
 
-      // Mise à jour du titre selon le mode
       const modeLabel = document.getElementById("mode-label");
       modeLabel.textContent = `Mode : ${mode === 'editable' ? 'Classique' : 'Review'}`;
 
-      // Affichage de l'ajout uniquement en mode éditable
       document.getElementById("add-task").style.display = (mode === "editable") ? "block" : "none";
     }
 
@@ -169,6 +237,19 @@
         audio.play().catch(() => {});
         sounds[filename] = audio;
       }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("new-task");
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const text = input.value.trim();
+          if (text) {
+            vscode.postMessage({ type: "addTask", text });
+            input.value = "";
+          }
+        }
+      });
     });
   </script>
 </body>
