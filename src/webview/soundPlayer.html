@@ -38,7 +38,7 @@
     }
 
     button.icon {
-      font-size: 16px;
+      font-size: 13px;
       background: none;
       border: none;
       padding: 4px;
@@ -81,6 +81,22 @@
       background-color: #222;
       color: white;
     }
+
+    #achievement-badge {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4caf50;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1em;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
@@ -95,6 +111,8 @@
 
   <ul id="task-list"></ul>
 
+  <div id="achievement-badge"></div>
+
   <script>
     const vscode = acquireVsCodeApi();
     const sounds = {};
@@ -103,6 +121,26 @@
 
     let mode = "editable";
     let tasks = [];
+
+    function playAchievementSound() {
+      const audio = new Audio('vscode-resource:media/achievement.mp3');
+      audio.volume = 1;
+      audio.play().catch(() => {});
+    }
+
+    function showAchievementBadge(text) {
+      const badge = document.getElementById("achievement-badge");
+      badge.textContent = `✔️ Tâche accomplie : "${text}"`;
+      badge.style.display = "block";
+      badge.style.opacity = "1";
+
+      setTimeout(() => {
+        badge.style.opacity = "0";
+        setTimeout(() => {
+          badge.style.display = "none";
+        }, 300);
+      }, 2000);
+    }
 
     function renderTasks() {
       const list = document.getElementById("task-list");
@@ -115,7 +153,13 @@
         checkbox.type = "checkbox";
         checkbox.checked = task.done;
         checkbox.onchange = () => {
+          const wasDone = task.done;
           vscode.postMessage({ type: "toggleTask", index });
+
+          if (!wasDone && checkbox.checked) {
+            playAchievementSound();
+            showAchievementBadge(task.text);
+          }
         };
 
         const label = document.createElement("span");
