@@ -80,6 +80,7 @@
       border-radius: 4px;
       background-color: #222;
       color: white;
+      margin-bottom: 6px;
     }
 
     #achievement-badge {
@@ -97,6 +98,25 @@
       transition: opacity 0.3s ease;
       z-index: 1000;
     }
+
+    #import-container {
+      display: none;
+      margin-bottom: 16px;
+    }
+
+    #import-btn {
+      padding: 8px 12px;
+      font-size: 0.95em;
+      background-color: #555;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #import-btn:hover {
+      background-color: #666;
+    }
   </style>
 </head>
 <body>
@@ -105,8 +125,13 @@
     <button id="switch-button" onclick="switchMode()">🔄</button>
   </div>
 
+  <div id="import-container">
+    <button id="import-btn">📂 Importer To-Do personnalisée</button>
+  </div>
+
   <div id="add-task">
     <input type="text" id="new-task" placeholder="Nouvelle tâche..." />
+    <input type="text" id="new-title" placeholder="Nouveau titre..." />
   </div>
 
   <ul id="task-list"></ul>
@@ -149,28 +174,39 @@
       tasks.forEach((task, index) => {
         const item = document.createElement("li");
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = task.done;
-        checkbox.onchange = () => {
-          const wasDone = task.done;
-          vscode.postMessage({ type: "toggleTask", index });
+        // ➤ Si c’est une tâche, on ajoute la checkbox
+        if (task.type === 'task') {
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = task.done;
+          checkbox.onchange = () => {
+            const wasDone = task.done;
+            vscode.postMessage({ type: "toggleTask", index });
 
-          if (!wasDone && checkbox.checked) {
-            playAchievementSound();
-            showAchievementBadge(task.text);
-          }
-        };
+            if (!wasDone && checkbox.checked) {
+              playAchievementSound();
+              showAchievementBadge(task.text);
+            }
+          };
+          item.appendChild(checkbox);
+        }
 
         const label = document.createElement("span");
         label.textContent = task.text;
         label.style.marginRight = "10px";
-        if (task.done) label.style.textDecoration = "line-through";
 
-        item.appendChild(checkbox);
+        // ➤ Ligne barrée uniquement si c’est une tâche cochée
+        if (task.type === 'task' && task.done) {
+          label.style.textDecoration = "line-through";
+        } else if (task.type === 'title') {
+          label.style.fontWeight = "bold";
+          label.style.color = "#aaa";
+        }
+
         item.appendChild(label);
 
-        if (mode === "editable") {
+        // ➤ Actions (édition, suppression, déplacement) uniquement pour les tâches en mode editable
+        if (mode === "editable" && task.type === 'task') {
           const editButton = document.createElement("button");
           editButton.className = "icon";
           editButton.textContent = "✏️";
@@ -188,7 +224,7 @@
               }
             };
 
-            item.replaceChildren(checkbox, input, saveBtn);
+            item.replaceChildren(input, saveBtn);
           };
 
           const deleteBtn = document.createElement("button");
@@ -225,15 +261,7 @@
       modeLabel.textContent = `Mode : ${mode === 'editable' ? 'Classique' : 'Review'}`;
 
       document.getElementById("add-task").style.display = (mode === "editable") ? "block" : "none";
-    }
-
-    function addTask() {
-      const input = document.getElementById("new-task");
-      const text = input.value.trim();
-      if (text) {
-        vscode.postMessage({ type: "addTask", text });
-        input.value = "";
-      }
+      document.getElementById("import-container").style.display = (mode === "review") ? "block" : "none";
     }
 
     function switchMode() {
@@ -284,15 +312,29 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
-      const input = document.getElementById("new-task");
-      input.addEventListener("keydown", (e) => {
+      document.getElementById("new-task").addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-          const text = input.value.trim();
+          const text = e.target.value.trim();
           if (text) {
-            vscode.postMessage({ type: "addTask", text });
-            input.value = "";
+            vscode.postMessage({ type: "addTask", text, isTitle: false });
+            e.target.value = "";
           }
         }
+      });
+
+      document.getElementById("new-title").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const text = e.target.value.trim();
+          if (text) {
+            vscode.postMessage({ type: "addTask", text, isTitle: true });
+            e.target.value = "";
+          }
+        }
+      });
+
+      const importBtn = document.getElementById("import-btn");
+      importBtn.addEventListener("click", () => {
+        vscode.postMessage({ type: "importCustomTodo" });
       });
     });
   </script>

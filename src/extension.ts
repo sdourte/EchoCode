@@ -5,7 +5,7 @@ import { SoundTreeDataProvider, SoundTreeItem } from './tree/soundView';
 import { RunSoundTreeDataProvider2, RunSoundTreeItem2, RunSoundType } from './tree/soundTerminal';
 import { exec } from 'child_process';
 import { buildKeybindingMap, runDefaultCommandsForKey } from './scripts/keybindingMapper';
-import { initializeTodo, getTasks, getMode, addTask, toggleTask, updateTask, moveTask, deleteTask, setMode } from './scripts/todo';
+import { initializeTodo, getTasks, getMode, addTask, toggleTask, updateTask, moveTask, deleteTask, setMode, loadCustomReviewText } from './scripts/todo';
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
 
@@ -81,46 +81,31 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 		soundWebviewPanel = undefined;
 	});
 
+	// Ajoute la gestion du type dans la réception des messages
 	soundWebviewPanel.webview.onDidReceiveMessage((message) => {
 		switch (message.type) {
 			case 'addTask':
-				if (getMode() === 'editable') {
-					addTask(message.text);
-					soundWebviewPanel?.webview.postMessage({
-						type: 'updateTasks',
-						tasks: getTasks(),
-						mode: getMode()
-					});
+				if (getMode() === 'editable' || getMode() === 'review') {
+					addTask(message.text, message.isTitle);
+					updateWebview();
 				}
 				break;
 
 			case 'toggleTask':
-				toggleTask(message.index);  // Pas de condition ici
-				soundWebviewPanel?.webview.postMessage({
-					type: 'updateTasks',
-					tasks: getTasks(),
-					mode: getMode()
-				});
+				toggleTask(message.index);
+				updateWebview();
 				break;
 
 			case 'switchMode':
 				const newMode = getMode() === 'editable' ? 'review' : 'editable';
 				setMode(newMode);
-				soundWebviewPanel?.webview.postMessage({
-					type: 'updateTasks',
-					tasks: getTasks(),
-					mode: getMode()
-				});
+				updateWebview();
 				break;
-			
+
 			case 'updateTask':
 				if (getMode() === 'editable') {
 					updateTask(message.index, message.text);
-					soundWebviewPanel?.webview.postMessage({
-						type: 'updateTasks',
-						tasks: getTasks(),
-						mode: getMode()
-					});
+					updateWebview();
 				}
 				break;
 
@@ -130,12 +115,14 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 					updateWebview();
 				}
 				break;
+
 			case 'moveTaskUp':
 				if (getMode() === 'editable') {
 					moveTask(message.index, message.index - 1);
 					updateWebview();
 				}
 				break;
+
 			case 'moveTaskDown':
 				if (getMode() === 'editable') {
 					moveTask(message.index, message.index + 1);
@@ -143,6 +130,24 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 				}
 				break;
 
+			case 'importCustomTodo':
+				vscode.window.showOpenDialog({
+					title: "Importer un fichier To-Do personnalisé",
+					canSelectMany: false,
+					filters: { 'Fichiers texte': ['txt'] }
+				}).then(fileUri => {
+					if (fileUri && fileUri[0]) {
+						try {
+							loadCustomReviewText(fileUri[0].fsPath);
+							updateWebview();
+							vscode.window.showInformationMessage('✅ To-Do Review importé avec succès.');
+						} catch (err) {
+							vscode.window.showErrorMessage("❌ Erreur lors de l'import du fichier personnalisé.");
+							console.error(err);
+						}
+					}
+				});
+				break;
 		}
 	});
 }
