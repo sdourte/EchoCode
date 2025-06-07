@@ -157,7 +157,7 @@ function playSoundWebview(soundFile: string, enabled: boolean, volume: number) {
 		if (enabled) {
 			soundWebviewPanel.webview.postMessage({ sound: soundFile, enabled, volume });
 		} else {
-			vscode.window.showWarningMessage(`⛔ Le son \"${soundFile}\" est désactivé.`);
+			vscode.window.showWarningMessage(`Le son \"${soundFile}\" est désactivé.`);
 		}
 	}
 }
@@ -295,6 +295,13 @@ export async function activate(context: vscode.ExtensionContext) {
 		const soundFile = await vscode.window.showQuickPick(files, {
 			placeHolder: 'Choisissez un fichier son existant dans media/'
 		});
+
+		// Vérifie si ce raccourci existe déjà
+		const existing = soundTreeDataProvider.getShortcut(shortcut);
+		if (existing) {
+			vscode.window.showWarningMessage(`Le raccourci "${shortcut}" existe déjà avec le son : ${existing.soundFile}`);
+			return;
+		}
 
 		if (soundFile) {
 			soundTreeDataProvider.addShortcut({ shortcut, soundFile, enabled: true, volume: 1 });
