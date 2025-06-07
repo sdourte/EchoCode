@@ -237,27 +237,83 @@ export async function activate(context: vscode.ExtensionContext) {
 				soundTreeDataProvider.updateSoundFile(item.shortcut, selected);
 			}
 		}),
+
 		vscode.commands.registerCommand('echocode.addShortcut', async () => {
-			const shortcut = await vscode.window.showInputBox({ prompt: 'Raccourci (ex: Ctrl+Alt+M)' });
-			const mediaFolder = path.join(context.extensionPath, 'media');
-			const files = fs.readdirSync(mediaFolder).filter(f => f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg'));
+		// Chemin vers ton fichier JSON
+		const keybindingsPath = path.join(context.extensionPath, 'src', 'data', 'defaultKeybindings.json');
 
-			const soundFile = await vscode.window.showQuickPick(files, {
-				placeHolder: 'Choisissez un fichier son existant dans media/'
+		if (!fs.existsSync(keybindingsPath)) {
+			vscode.window.showErrorMessage('❌ Fichier defaultKeybindings.json introuvable.');
+			return;
+		}
+
+		// Lecture et parsing
+		const rawData = fs.readFileSync(keybindingsPath, 'utf-8');
+		let parsed: any[];
+		try {
+			parsed = JSON.parse(rawData);
+		} catch (e) {
+			vscode.window.showErrorMessage('❌ Erreur de parsing du fichier defaultKeybindings.json');
+			console.error(e);
+			return;
+		}
+
+		// Récupère toutes les touches (clé "key")
+		const allKeys = [...new Set(
+			parsed
+				.map(entry => entry.key)
+				.filter((key: string | undefined) => typeof key === 'string' && key.trim() !== '')
+		)].sort((a, b) => a.localeCompare(b, 'fr'));
+
+		allKeys.push('✏️ Entrer manuellement...');
+
+		// Sélection du raccourci
+		const shortcutPick = await vscode.window.showQuickPick(allKeys, {
+			placeHolder: 'Choisissez un raccourci clavier depuis les keybindings'
+		});
+
+		let shortcut: string | undefined;
+
+		if (!shortcutPick) {return;}
+
+		if (shortcutPick === '✏️ Entrer manuellement...') {
+			shortcut = await vscode.window.showInputBox({
+				prompt: 'Entrez votre raccourci personnalisé (ex: Ctrl+Alt+M)'
 			});
+		} else {
+			shortcut = shortcutPick;
+		}
 
-			if (shortcut && soundFile) {
-				soundTreeDataProvider.addShortcut({ shortcut, soundFile, enabled: true, volume: 1 });
-				vscode.window.showInformationMessage(`Raccourci ajouté : ${shortcut}`);
-			}
-			updateKeybindings(context);
-			await new Promise(resolve => setTimeout(resolve, 10000));
-			if (soundWebviewPanel) {
-				vscode.window.showInformationMessage('Fermeture de la WebView');
-				soundWebviewPanel.dispose();
-			}
-			await vscode.commands.executeCommand('workbench.action.reloadWindow');
-		}),
+		if (!shortcut) {return;}
+
+		// Choix du fichier son
+		const mediaFolder = path.join(context.extensionPath, 'media');
+		const files = fs.readdirSync(mediaFolder).filter(f =>
+			f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg')
+		);
+
+		const soundFile = await vscode.window.showQuickPick(files, {
+			placeHolder: 'Choisissez un fichier son existant dans media/'
+		});
+
+		if (soundFile) {
+			soundTreeDataProvider.addShortcut({ shortcut, soundFile, enabled: true, volume: 1 });
+			vscode.window.showInformationMessage(`✅ Raccourci ajouté : ${shortcut}`);
+			vscode.window.showInformationMessage('🔄 Rechargement de la fenêtre pour appliquer les changements...');
+		}
+
+		updateKeybindings(context);
+
+		await new Promise(resolve => setTimeout(resolve, 10000));
+
+		if (soundWebviewPanel) {
+			vscode.window.showInformationMessage('Fermeture de la WebView');
+			soundWebviewPanel.dispose();
+		}
+
+		await vscode.commands.executeCommand('workbench.action.reloadWindow');
+	}),
+
 		vscode.commands.registerCommand('echocode.removeShortcut', async (item: SoundTreeItem) => {
 			if (!item) {return;}
 			const confirm = await vscode.window.showWarningMessage(
@@ -267,7 +323,8 @@ export async function activate(context: vscode.ExtensionContext) {
 			);
 			if (confirm === 'Oui') {
 				soundTreeDataProvider.removeShortcut(item.shortcut);
-				vscode.window.showInformationMessage(`Raccourci supprimé : ${item.shortcut}`);
+				vscode.window.showInformationMessage(`❌ Raccourci supprimé : ${item.shortcut}`);
+				vscode.window.showInformationMessage('🔄 Rechargement de la fenêtre pour appliquer les changements...');
 				updateKeybindings(context);
 				await new Promise(resolve => setTimeout(resolve, 6000));
 				if (soundWebviewPanel) {
