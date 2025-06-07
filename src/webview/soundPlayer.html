@@ -137,8 +137,8 @@
   </div>
 
   <div id="add-task">
-    <input type="text" id="new-task" placeholder="Nouvelle tâche..." />
     <input type="text" id="new-title" placeholder="Nouveau titre..." />
+    <input type="text" id="new-task" placeholder="Nouvelle tâche..." />
   </div>
 
   <ul id="task-list"></ul>
@@ -155,7 +155,7 @@
     let tasks = [];
 
     function playAchievementSound() {
-      const audio = new Audio('vscode-resource:media/achievement.mp3');
+      const audio = new Audio('vscode-resource:media/levelup.mp3');
       audio.volume = 1;
       audio.play().catch(() => {});
     }
@@ -166,12 +166,17 @@
       badge.style.display = "block";
       badge.style.opacity = "1";
 
+      // Affiche le badge pendant 2 secondes, puis commence à le faire disparaître
       setTimeout(() => {
-        badge.style.opacity = "0";
+        badge.style.opacity = "0"; // Rend le badge invisible (via transition CSS)
+
+        // Après 300 ms (le temps que la transition d'opacité se termine),
+        // on le retire complètement de l'affichage
         setTimeout(() => {
           badge.style.display = "none";
-        }, 300);
-      }, 2000);
+        }, 300); // ⬅️ Changer cette valeur pour modifier la durée de la disparition (fade out)
+
+      }, 3000); // ⬅️ Changer cette valeur pour modifier le temps d'affichage **avant** disparition
     }
 
     function renderTasks() {

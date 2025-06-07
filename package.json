@@ -81,6 +81,11 @@
         "category": "Sound Shortcut"
       },
       {
+        "command": "echocode.importSound",
+        "title": "📁 Importer un fichier son",
+        "category": "Sound Shortcut"
+      },
+      {
         "command": "echocode.playRunSound",
         "title": "Jouer un son post-run",
         "category": "Run Sound"
@@ -131,6 +136,11 @@
         "key": "ctrl+y",
         "command": "echocode.printCtrlY",
         "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+x",
+        "command": "echocode.printctrlx",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {
@@ -163,7 +173,7 @@
       ],
       "view/title": [
         {
-          "command": "echocode.addShortcut",
+          "command": "echocode.importSound",
           "when": "view == soundExplorer",
           "group": "navigation"
         }

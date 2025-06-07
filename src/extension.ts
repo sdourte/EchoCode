@@ -224,9 +224,11 @@ export async function activate(context: vscode.ExtensionContext) {
 			soundTreeDataProvider.updateVolume(item.shortcut, item.volume - 0.1);
 		}),
 		vscode.commands.registerCommand('echocode.changeSound', async (item: SoundTreeItem) => {
-			const newFile = await vscode.window.showInputBox({
-				prompt: 'Nouveau fichier son (ex: beep.mp3)',
-				value: item.soundFile
+			const mediaFolder = path.join(context.extensionPath, 'media');
+			const files = fs.readdirSync(mediaFolder).filter(f => f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg'));
+
+			const newFile = await vscode.window.showQuickPick(files, {
+				placeHolder: 'Choisissez un nouveau fichier son depuis le dossier media'
 			});
 			if (newFile) {
 				soundTreeDataProvider.updateSoundFile(item.shortcut, newFile);
@@ -234,7 +236,13 @@ export async function activate(context: vscode.ExtensionContext) {
 		}),
 		vscode.commands.registerCommand('echocode.addShortcut', async () => {
 			const shortcut = await vscode.window.showInputBox({ prompt: 'Raccourci (ex: Ctrl+Alt+M)' });
-			const soundFile = await vscode.window.showInputBox({ prompt: 'Nom du fichier son (ex: magic.mp3)' });
+			const mediaFolder = path.join(context.extensionPath, 'media');
+			const files = fs.readdirSync(mediaFolder).filter(f => f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg'));
+
+			const soundFile = await vscode.window.showQuickPick(files, {
+				placeHolder: 'Choisissez un fichier son existant dans media/'
+			});
+
 			if (shortcut && soundFile) {
 				soundTreeDataProvider.addShortcut({ shortcut, soundFile, enabled: true, volume: 1 });
 				vscode.window.showInformationMessage(`Raccourci ajouté : ${shortcut}`);
@@ -285,15 +293,50 @@ export async function activate(context: vscode.ExtensionContext) {
 			runSoundProvider.toggle(item.type);
 		}),
 		vscode.commands.registerCommand('echocode.changeRunSound', async (item: RunSoundTreeItem2) => {
-			const newFile = await vscode.window.showInputBox({
-				prompt: 'Nouveau fichier son pour ce type de run',
-				value: item.soundFile
-			});
-			if (newFile) {
-				runSoundProvider.updateSoundFile(item.type, newFile);
-			}
+			if (!item) {return;}
+			await runSoundProvider.updateSoundFile(item.type, item.soundFile);
 		})
 	];
+
+	const importSoundCommand = vscode.commands.registerCommand('echocode.importSound', async () => {
+		const fileUri = await vscode.window.showOpenDialog({
+			title: "Importer un son personnalisé",
+			canSelectMany: false,
+			filters: { 'Fichiers audio': ['wav', 'mp3', 'ogg'] }
+		});
+
+		if (!fileUri || fileUri.length === 0) {
+			return;
+		}
+
+		const sourcePath = fileUri[0].fsPath;
+		const fileName = path.basename(sourcePath);
+		const destPath = path.join(context.extensionPath, 'media', fileName);
+
+		// Vérifie l'existence du dossier media
+		if (!fs.existsSync(path.dirname(destPath))) {
+			fs.mkdirSync(path.dirname(destPath), { recursive: true });
+		}
+
+		// Copie du fichier
+		try {
+			fs.copyFileSync(sourcePath, destPath);
+			vscode.window.showInformationMessage(`✅ Son "${fileName}" importé avec succès !`);
+
+			// Si la WebView est ouverte, on l'informe d'un nouveau son
+			if (soundWebviewPanel) {
+				soundWebviewPanel.webview.postMessage({
+					type: 'newSoundImported',
+					sound: fileName
+				});
+			}
+		} catch (err) {
+			console.error(err);
+			vscode.window.showErrorMessage("❌ Échec de l'import du son.");
+		}
+	});
+	context.subscriptions.push(importSoundCommand);
+
 
 	vscode.window.onDidEndTerminalShellExecution((event) => {
 		const exitCode = event.exitCode;
