@@ -121,6 +121,21 @@
         "key": "ctrl+s",
         "command": "echocode.printctrls",
         "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+v",
+        "command": "echocode.printctrlv",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+z",
+        "command": "echocode.printctrlz",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+y",
+        "command": "echocode.printctrly",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {

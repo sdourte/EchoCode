@@ -9,20 +9,26 @@ import { initializeTodo, getTasks, getMode, addTask, toggleTask, updateTask, mov
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
 
-function updateKeybindings(context: vscode.ExtensionContext) {
+function updateKeybindings(context: vscode.ExtensionContext): Promise<void> {
 	const extensionRoot = context.extensionPath;
 	const command = 'npm run update:keybindings';
-	exec(command, { cwd: extensionRoot }, (error, stdout, stderr) => {
-		if (error) {
-			console.error(`Erreur lors de la génération des keybindings : ${error.message}`);
-			vscode.window.showErrorMessage(`Erreur lors de la génération des keybindings : ${error.message}`);
-			return;
-		}
-		if (stderr) {
-			console.warn(`Warnings lors de la génération des keybindings : ${stderr}`);
-		}
-		console.log(`Keybindings générés : ${stdout}`);
-		vscode.window.showInformationMessage('Keybindings mis à jour avec succès !');		
+
+	return new Promise((resolve, reject) => {
+		exec(command, { cwd: extensionRoot }, (error, stdout, stderr) => {
+			if (error) {
+				console.error(`Erreur lors de la génération des keybindings : ${error.message}`);
+				vscode.window.showErrorMessage(`❌ Erreur lors de la génération des keybindings : ${error.message}`);
+				return reject(error);
+			}
+
+			if (stderr) {
+				console.warn(`⚠️ Warnings lors de la génération des keybindings : ${stderr}`);
+			}
+
+			console.log(`✅ Keybindings générés : ${stdout}`);
+			vscode.window.showInformationMessage('✅ Keybindings mis à jour avec succès !');
+			resolve();
+		});
 	});
 }
 
@@ -309,9 +315,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage('🔄 Rechargement de la fenêtre pour appliquer les changements...');
 		}
 
-		updateKeybindings(context);
+		await updateKeybindings(context); // ⬅️ on attend la vraie fin
 
-		await new Promise(resolve => setTimeout(resolve, 10000));
+		//await new Promise(resolve => setTimeout(resolve, 10000));
 
 		if (soundWebviewPanel) {
 			vscode.window.showInformationMessage('Fermeture de la WebView');
@@ -332,8 +338,8 @@ export async function activate(context: vscode.ExtensionContext) {
 				soundTreeDataProvider.removeShortcut(item.shortcut);
 				vscode.window.showInformationMessage(`❌ Raccourci supprimé : ${item.shortcut}`);
 				vscode.window.showInformationMessage('🔄 Rechargement de la fenêtre pour appliquer les changements...');
-				updateKeybindings(context);
-				await new Promise(resolve => setTimeout(resolve, 6000));
+				await updateKeybindings(context);
+				//await new Promise(resolve => setTimeout(resolve, 6000));
 				if (soundWebviewPanel) {
 					soundWebviewPanel.dispose();
 				}
