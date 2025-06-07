@@ -26,13 +26,13 @@ export class RunSoundTreeItem2 extends vscode.TreeItem {
 				? 'Augmenter le volume'
 				: isVolumeControl === 'decrease'
 				? 'Diminuer le volume'
-				: `Son ${type === 'success' ? '✔️ Succès' : '❌ Erreur'}`,
+				: `${type === 'success' ? 'Succès' : 'Erreur'}`,
 			isVolumeControl ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed
 		);
 
 		if (!isVolumeControl) {
 			this.tooltip = `Son: ${soundFile}\nÉtat: ${enabled ? 'Activé' : 'Désactivé'}\nVolume: ${Math.round(volume * 100)}%`;
-			this.description = `${soundFile} • ${enabled ? '🔊' : '🔇'} • ${Math.round(volume * 100)}%`;
+			this.description = `${enabled ? '🔊' : '🔇'} • ${Math.round(volume * 100)}%`;
 			this.contextValue = 'runSoundItem';
 			this.iconPath = new vscode.ThemeIcon(enabled ? 'unmute' : 'mute');
 
