@@ -136,11 +136,6 @@
         "key": "ctrl+y",
         "command": "echocode.printCtrlY",
         "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+x",
-        "command": "echocode.printctrlx",
-        "when": "editorTextFocus"
       }
     ],
     "menus": {

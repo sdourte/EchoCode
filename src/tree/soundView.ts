@@ -132,6 +132,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 			item.soundFile = newFile;
 			this.saveShortcuts();
 			this.refresh();
+			vscode.window.showInformationMessage(`✅ Son mis à jour pour le raccourci "${shortcut}" : ${newFile}`);
 		}
 	}
 

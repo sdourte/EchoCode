@@ -224,14 +224,17 @@ export async function activate(context: vscode.ExtensionContext) {
 			soundTreeDataProvider.updateVolume(item.shortcut, item.volume - 0.1);
 		}),
 		vscode.commands.registerCommand('echocode.changeSound', async (item: SoundTreeItem) => {
+			if (!item) {return;}
+
 			const mediaFolder = path.join(context.extensionPath, 'media');
 			const files = fs.readdirSync(mediaFolder).filter(f => f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg'));
 
-			const newFile = await vscode.window.showQuickPick(files, {
-				placeHolder: 'Choisissez un nouveau fichier son depuis le dossier media'
+			const selected = await vscode.window.showQuickPick(files, {
+				placeHolder: 'Choisissez un nouveau son pour ce raccourci'
 			});
-			if (newFile) {
-				soundTreeDataProvider.updateSoundFile(item.shortcut, newFile);
+
+			if (selected) {
+				soundTreeDataProvider.updateSoundFile(item.shortcut, selected);
 			}
 		}),
 		vscode.commands.registerCommand('echocode.addShortcut', async () => {
@@ -294,7 +297,17 @@ export async function activate(context: vscode.ExtensionContext) {
 		}),
 		vscode.commands.registerCommand('echocode.changeRunSound', async (item: RunSoundTreeItem2) => {
 			if (!item) {return;}
-			await runSoundProvider.updateSoundFile(item.type, item.soundFile);
+
+			const mediaFolder = path.join(context.extensionPath, 'media');
+			const files = fs.readdirSync(mediaFolder).filter(f => f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg'));
+
+			const selected = await vscode.window.showQuickPick(files, {
+				placeHolder: 'Choisissez un nouveau son pour ce type'
+			});
+
+			if (selected) {
+				runSoundProvider.updateSoundFile(item.type, selected);
+			}
 		})
 	];
 

@@ -106,25 +106,7 @@ export class RunSoundTreeDataProvider2 implements vscode.TreeDataProvider<RunSou
 		}
 	}
 
-	// ✅ Méthode mise à jour avec QuickPick
-	async updateSoundFile(type: RunSoundType, currentFile: string) {
-		const mediaFolder = path.join(__dirname, '..', '..', 'media');
-		const files = fs.existsSync(mediaFolder)
-			? fs.readdirSync(mediaFolder).filter(f => f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg'))
-			: [];
-
-		if (files.length === 0) {
-			vscode.window.showWarningMessage('Aucun fichier audio trouvé dans le dossier media.');
-			return;
-		}
-
-		const newFile = await vscode.window.showQuickPick(files, {
-			placeHolder: 'Choisissez un nouveau son pour ce type de run',
-			title: `Changer le son de "${type}"`,
-		});
-
-		if (!newFile) {return;}
-
+	updateSoundFile(type: RunSoundType, newFile: string) {
 		const item = this.runSounds.find(s => s.type === type);
 		if (item) {
 			item.soundFile = newFile;

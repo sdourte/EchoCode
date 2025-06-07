@@ -94,7 +94,7 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      background: #4caf50;
+      background: #348437;
       color: white;
       padding: 12px 18px;
       border-radius: 8px;
@@ -162,7 +162,7 @@
 
     function showAchievementBadge(text) {
       const badge = document.getElementById("achievement-badge");
-      badge.textContent = `✔️ Tâche accomplie : "${text}"`;
+      badge.innerHTML = `✅ Tâche accomplie ✅<br>"${text}"`;
       badge.style.display = "block";
       badge.style.opacity = "1";
 
@@ -320,6 +320,7 @@
       interactionUnlocked = true;
       for (const filename of preloadSoundList) {
         const audio = new Audio(`vscode-resource:media/${filename}`);
+        console.log(`Preloading sound: ${filename}`);
         audio.volume = 0;
         audio.play().catch(() => {});
         sounds[filename] = audio;
