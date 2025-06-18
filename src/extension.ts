@@ -47,7 +47,7 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 
 	soundWebviewPanel = vscode.window.createWebviewPanel(
 		'echocodeSoundPlayer',
-		'Sound Player',
+		'To-Do List',
 		vscode.ViewColumn.Beside,
 		{
 			enableScripts: true,
