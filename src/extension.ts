@@ -176,6 +176,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	const startDisposable = vscode.commands.registerCommand('echocode.start', () => {
 		vscode.window.showInformationMessage('Starting EchoCode!');
 		createOrShowSoundWebView(context);
+		// Affiche un message d'information pour l'utilisateur
+		vscode.window.showInformationMessage("Cliquez une fois sur la To-Do List pour activer les sons");
 	});
 	context.subscriptions.push(startDisposable);
 
