@@ -67,7 +67,7 @@ export function addTask(text: string, isTitle: boolean = false) {
   }
 
   const newTask: Task = {
-    text: isTitle ? `📌 ${text}` : text,
+    text: isTitle ? `${text}` : text,
     done: false,
     type: isTitle ? 'title' : 'task'
   };
@@ -153,7 +153,7 @@ export function loadCustomReviewText(filePath: string) {
     const trimmed = line.trim();
     if (trimmed.startsWith('#')) {
       const title = trimmed.replace(/^#+\s*/, '').trim();
-      tasks.push({ text: `📌 ${title}`, done: false, type: 'title' });
+      tasks.push({ text: `${title}`, done: false, type: 'title' });
     } else if (trimmed.startsWith('||') && trimmed.endsWith('||')) {
       const task = trimmed.slice(2, -2).trim();
       tasks.push({ text: task, done: false, type: 'task' });

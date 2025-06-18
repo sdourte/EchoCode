@@ -58,7 +58,6 @@
 
     #header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
@@ -71,7 +70,7 @@
 
     #switch-button {
       background: none;
-      font-size: 2em;
+      font-size: 1.5em;
       cursor: pointer;
       color: #444;
       border: none;
@@ -104,7 +103,7 @@
       font-size: 1em;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.35s ease;
       z-index: 1000;
     }
 
@@ -129,6 +128,8 @@
   </style>
 </head>
 <body>
+  <h1>To-Do List</h1>
+  
   <div id="header">
     <div id="mode-label">Mode : Classique</div>
     <button id="switch-button" onclick="switchMode()">🔄</button>
@@ -178,7 +179,7 @@
           badge.style.display = "none";
         }, 300); // ⬅️ Changer cette valeur pour modifier la durée de la disparition (fade out)
 
-      }, 3000); // ⬅️ Changer cette valeur pour modifier le temps d'affichage **avant** disparition
+      }, 3500); // ⬅️ Changer cette valeur pour modifier le temps d'affichage **avant** disparition
     }
 
     function renderTasks() {
@@ -223,7 +224,7 @@
         item.appendChild(label);
 
         // ➤ Actions (édition, suppression, déplacement) uniquement pour les tâches en mode editable
-        if (mode === "editable" && task.type === 'task') {
+        if (mode === "editable") {
           const editButton = document.createElement("button");
           editButton.className = "icon";
           editButton.textContent = "✏️";
