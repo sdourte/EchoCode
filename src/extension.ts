@@ -181,6 +181,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.executeCommand('echocode.start');
 
+	// Ajout d'un bouton pour relancer la WebView si elle a été fermée
+	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	statusBarItem.text = '$(unmute) EchoCode';
+	statusBarItem.tooltip = 'Ouvrir EchoCode';
+	statusBarItem.command = 'echocode.start';
+	statusBarItem.show();
+
 	const soundTreeDataProvider = new SoundTreeDataProvider();
 	vscode.window.registerTreeDataProvider('soundExplorer', soundTreeDataProvider);
 
