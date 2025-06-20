@@ -111,33 +111,7 @@
         "category": "Run Sound"
       }
     ],
-    "keybindings": [
-      {
-        "key": "ctrl+c",
-        "command": "echocode.printCtrlC",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+v",
-        "command": "echocode.printCtrlV",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+x",
-        "command": "echocode.printCtrlX",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+z",
-        "command": "echocode.printCtrlZ",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+y",
-        "command": "echocode.printCtrlY",
-        "when": "editorTextFocus"
-      }
-    ],
+    "keybindings": [],
     "menus": {
       "view/item/context": [
         {

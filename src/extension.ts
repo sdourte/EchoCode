@@ -9,6 +9,28 @@ import { initializeTodo, getTasks, getMode, addTask, toggleTask, updateTask, mov
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
 
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+let listenerProcess: ChildProcessWithoutNullStreams;
+
+function startKeyListener() {
+    listenerProcess = spawn('node', [path.join(__dirname, 'key-listener.js')]);
+
+    listenerProcess.stdout.on('data', (data) => {
+        const msg = data.toString().trim();
+        if (msg.startsWith('KEY:')) {
+            const shortcut = msg.replace('KEY:', '');
+            // Joue un son depuis l'extension ou notifie la TreeView
+        }
+    });
+}
+
+function stopKeyListener() {
+    if (listenerProcess) {
+        listenerProcess.kill();
+    }
+}
+
+
 function updateKeybindings(context: vscode.ExtensionContext): Promise<void> {
 	const extensionRoot = context.extensionPath;
 	const command = 'npm run update:keybindings';
