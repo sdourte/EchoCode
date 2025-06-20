@@ -1,0 +1,16 @@
+[
+  {
+    "shortcut": "success",
+    "soundFile": "success.mp3",
+    "enabled": true,
+    "volume": 1,
+    "type": "success"
+  },
+  {
+    "shortcut": "error",
+    "soundFile": "error.mp3",
+    "enabled": true,
+    "volume": 1,
+    "type": "error"
+  }
+]

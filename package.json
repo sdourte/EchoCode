@@ -114,7 +114,27 @@
     "keybindings": [
       {
         "key": "ctrl+c",
-        "command": "echocode.printctrlc",
+        "command": "echocode.printCtrlC",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+v",
+        "command": "echocode.printCtrlV",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+x",
+        "command": "echocode.printCtrlX",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+z",
+        "command": "echocode.printCtrlZ",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+y",
+        "command": "echocode.printCtrlY",
         "when": "editorTextFocus"
       }
     ],
@@ -156,10 +176,10 @@
     }
   },
   "scripts": {
-    "precompile": "npm run update:keybindings",
+    "copy:data": "npx cpy src/data/**/* out/data --parents",
     "update:keybindings": "node out/scripts/updateKeybindings.js",
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && npm run copy:data && npm run update:keybindings",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
@@ -173,6 +193,7 @@
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
+    "cpy-cli": "^5.0.0",
     "eslint": "^9.25.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"

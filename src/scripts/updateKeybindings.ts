@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const shortcutsPath = path.join(__dirname, '..', '..', 'out', 'shortcuts.json');
+const shortcutsPath = path.join(__dirname, '..', 'data', 'shortcuts.json');
 const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
 
 const shortcuts = JSON.parse(fs.readFileSync(shortcutsPath, 'utf8'));

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-const RUN_SOUNDS_FILE = path.join(__dirname, '..', '..', 'out', 'runSounds.json');
+const RUN_SOUNDS_FILE = path.join(__dirname, '..', 'data', 'runSounds.json');
 
 export type RunSoundType = 'success' | 'error';
 

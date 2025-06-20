@@ -1,4 +1,4 @@
-# Exclusions générales
+# 📂 Exclusions générales
 .vscode/**
 .vscode-test/**
 .gitignore
@@ -6,14 +6,11 @@
 vsc-extension-quickstart.md
 **/tsconfig.json
 **/eslint.config.mjs
-**/*.map
 **/*.ts
+**/*.map
 **/.vscode-test.*
 
-# Réinclusions nécessaires (doivent être après les exclusions)
-!out/**
-!media/**
-!src/webview/soundPlayer.html
-!src/scripts/updateKeybindings.ts
-!src/tree/SoundView.ts
-!src/extension.ts
+# ✅ Réinclusions utiles
+!media/**                      # Tu as des sons/images, donc garde ça
+!src/webview/soundPlayer.html # HTML nécessaire à la WebView
+!src/data/**                   # ✅ Ton nouveau répertoire avec shortcuts.json etc.

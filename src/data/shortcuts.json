@@ -1,0 +1,32 @@
+[
+  {
+    "shortcut": "Ctrl+C",
+    "soundFile": "select_001.mp3",
+    "enabled": true,
+    "volume": 1
+  },
+  {
+    "shortcut": "Ctrl+V",
+    "soundFile": "select_002.mp3",
+    "enabled": true,
+    "volume": 1
+  },
+  {
+    "shortcut": "Ctrl+X",
+    "soundFile": "select_008.mp3",
+    "enabled": true,
+    "volume": 1
+  },
+  {
+    "shortcut": "Ctrl+Z",
+    "soundFile": "pluck_001.mp3",
+    "enabled": true,
+    "volume": 1
+  },
+  {
+    "shortcut": "Ctrl+Y",
+    "soundFile": "pluck_002.mp3",
+    "enabled": true,
+    "volume": 1
+  }
+]
