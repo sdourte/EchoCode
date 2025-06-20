@@ -116,31 +116,6 @@
         "key": "ctrl+c",
         "command": "echocode.printctrlc",
         "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+s",
-        "command": "echocode.printctrls",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+v",
-        "command": "echocode.printctrlv",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+z",
-        "command": "echocode.printctrlz",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+y",
-        "command": "echocode.printctrly",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+x",
-        "command": "echocode.printctrlx",
-        "when": "editorTextFocus"
       }
     ],
     "menus": {
@@ -182,7 +157,7 @@
   },
   "scripts": {
     "precompile": "npm run update:keybindings",
-    "update:keybindings": "ts-node src/scripts/updateKeybindings.ts",
+    "update:keybindings": "node out/scripts/updateKeybindings.js",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
