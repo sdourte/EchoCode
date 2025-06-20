@@ -4,14 +4,13 @@ import * as fs from 'fs';
 
 const SHORTCUTS_FILE = path.join(__dirname, '..', '..', 'out', 'shortcuts.json');
 
-export interface SoundShortcut {
-	shortcut: string;
+export interface SlotConfig {
 	soundFile: string;
 	enabled: boolean;
-	volume: number; // 0 to 1
+	volume: number;
 }
 
-type SoundShortcutData = SoundShortcut;
+type SlotMap = Record<string, SlotConfig>;
 
 // 🔹 Item pour les raccourcis (inchangé)
 export class SoundTreeItem extends vscode.TreeItem {
@@ -69,7 +68,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 	private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<vscode.TreeItem | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-	private shortcuts: SoundShortcut[] = [];
+	private slotMap: SlotMap = {};
 
 	constructor() {
 		this.loadShortcuts();
@@ -87,14 +86,17 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 		if (!element) {
 			const items: vscode.TreeItem[] = [];
 
-			// Ajouter le bouton "Ajouter un raccourci"
+			// ➕ Ajouter le bouton d'ajout
 			items.push(new AddShortcutTreeItem());
 
-			// Ajouter les raccourcis existants
-			for (const data of this.shortcuts) {
-				items.push(new SoundTreeItem(data.shortcut, data.soundFile, data.enabled, data.volume));
+			// Afficher les 5 slots
+			const orderedSlots = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5'];
+			for (const slot of orderedSlots) {
+				const data = this.slotMap[slot];
+				if (data) {
+					items.push(new SoundTreeItem(slot, data.soundFile, data.enabled, data.volume));
+				}
 			}
-
 			return items;
 		}
 
@@ -108,71 +110,61 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 		return [];
 	}
 
-	toggleShortcut(shortcut: string) {
-		const item = this.shortcuts.find(s => s.shortcut === shortcut);
-		if (item) {
-			item.enabled = !item.enabled;
-			this.saveShortcuts();
+	toggleShortcut(slotId: string) {
+		const config = this.slotMap[slotId];
+		if (config) {
+			config.enabled = !config.enabled;
+			this.saveSlots();
 			this.refresh();
 		}
 	}
 
-	updateVolume(shortcut: string, newVolume: number) {
-		const item = this.shortcuts.find(s => s.shortcut === shortcut);
-		if (item) {
-			item.volume = Math.max(0, Math.min(1, newVolume));
-			this.saveShortcuts();
+	updateVolume(slotId: string, newVolume: number) {
+		const config = this.slotMap[slotId];
+		if (config) {
+			config.volume = Math.max(0, Math.min(1, newVolume));
+			this.saveSlots();
 			this.refresh();
 		}
 	}
 
-	updateSoundFile(shortcut: string, newFile: string) {
-		const item = this.shortcuts.find(s => s.shortcut === shortcut);
-		if (item) {
-			item.soundFile = newFile;
-			this.saveShortcuts();
+	updateSoundFile(slotId: string, newFile: string) {
+		const config = this.slotMap[slotId];
+		if (config) {
+			config.soundFile = newFile;
+			this.saveSlots();
 			this.refresh();
-			vscode.window.showInformationMessage(`✅ Son mis à jour pour le raccourci "${shortcut}" : ${newFile}`);
+			vscode.window.showInformationMessage(`✅ Son mis à jour pour le raccourci "${slotId}" : ${newFile}`);
 		}
 	}
 
-	addShortcut(data: SoundShortcutData) {
-		this.shortcuts.push(data);
-		this.saveShortcuts();
-		this._onDidChangeTreeData.fire();
-	}
-
-	removeShortcut(shortcut: string) {
-		this.shortcuts = this.shortcuts.filter(s => s.shortcut !== shortcut);
-		this.saveShortcuts();
+	updateSlot(slotId: string, config: SlotConfig) {
+		this.slotMap[slotId] = config;
+		this.saveSlots();
 		this.refresh();
 	}
 
-	getShortcut(shortcut: string): SoundShortcut | undefined {
-		return this.shortcuts.find(s => s.shortcut === shortcut);
-	}
-
-	getAllShortcuts(): SoundShortcut[] {
-		return this.shortcuts;
+	getSlotConfig(slotId: string): SlotConfig | undefined {
+		return this.slotMap[slotId];
 	}
 
 	private loadShortcuts() {
 		if (fs.existsSync(SHORTCUTS_FILE)) {
 			try {
 				const data = fs.readFileSync(SHORTCUTS_FILE, 'utf-8');
-				this.shortcuts = JSON.parse(data);
+				this.slotMap = JSON.parse(data);
 			} catch (error) {
 				console.error('Erreur lors du chargement des raccourcis :', error);
-				this.shortcuts = [];
+				this.slotMap = {};
 			}
 		}
 	}
 
-	private saveShortcuts() {
+	private saveSlots() {
 		try {
-			fs.writeFileSync(SHORTCUTS_FILE, JSON.stringify(this.shortcuts, null, 2));
+			fs.writeFileSync(SHORTCUTS_FILE, JSON.stringify(this.slotMap, null, 2));
 		} catch (error) {
-			console.error('Erreur lors de la sauvegarde des raccourcis :', error);
+			console.error('Erreur lors de la sauvegarde des slots :', error);
 		}
 	}
 }

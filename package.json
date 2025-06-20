@@ -109,12 +109,52 @@
         "command": "echocode.changeRunSound",
         "title": "Changer le fichier son post-run",
         "category": "Run Sound"
+      },
+      {
+        "command": "echocode.slot1",
+        "title": "Shortcut Slot 1"
+      },
+      {
+        "command": "echocode.slot2",
+        "title": "Shortcut Slot 2"
+      },
+      {
+        "command": "echocode.slot3",
+        "title": "Shortcut Slot 3"
+      },
+      {
+        "command": "echocode.slot4",
+        "title": "Shortcut Slot 4"
+      },
+      {
+        "command": "echocode.slot5",
+        "title": "Shortcut Slot 5"
       }
     ],
     "keybindings": [
       {
         "key": "ctrl+c",
-        "command": "echocode.printctrlc",
+        "command": "echocode.slot1",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+v",
+        "command": "echocode.slot2",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+x",
+        "command": "echocode.slot3",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+z",
+        "command": "echocode.slot4",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+y",
+        "command": "echocode.slot5",
         "when": "editorTextFocus"
       }
     ],
@@ -155,16 +195,7 @@
       ]
     }
   },
-  "scripts": {
-    "precompile": "npm run update:keybindings",
-    "update:keybindings": "node out/scripts/updateKeybindings.js",
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
-  },
+  "scripts": {},
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
