@@ -1,7 +1,6 @@
 {
   "name": "echocode",
   "displayName": "EchoCode",
-  "description": "",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.100.0"
@@ -11,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/sdourte/EchoCode.git"
+    "url": "git+https://github.com/sdourte/EchoCode.git"
   },
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -173,6 +172,15 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "node-global-key-listener": "^0.3.0",
     "play-sound": "^1.1.6"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/sdourte/EchoCode/issues"
+  },
+  "homepage": "https://github.com/sdourte/EchoCode#readme",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

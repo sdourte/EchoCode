@@ -11,9 +11,7 @@ export interface SoundShortcut {
 	volume: number; // 0 to 1
 }
 
-type SoundShortcutData = SoundShortcut;
-
-// 🔹 Item pour les raccourcis (inchangé)
+// 🔹 Item pour les raccourcis
 export class SoundTreeItem extends vscode.TreeItem {
 	constructor(
 		public readonly shortcut: string,
@@ -53,7 +51,7 @@ export class SoundTreeItem extends vscode.TreeItem {
 	}
 }
 
-// 🔹 Item spécial pour "Ajouter un raccourci"
+// 🔹 Item pour "Ajouter un raccourci"
 export class AddShortcutTreeItem extends vscode.TreeItem {
 	constructor() {
 		super('➕ Ajouter un raccourci', vscode.TreeItemCollapsibleState.None);
@@ -86,15 +84,10 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 	getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
 		if (!element) {
 			const items: vscode.TreeItem[] = [];
-
-			// Ajouter le bouton "Ajouter un raccourci"
 			items.push(new AddShortcutTreeItem());
-
-			// Ajouter les raccourcis existants
 			for (const data of this.shortcuts) {
 				items.push(new SoundTreeItem(data.shortcut, data.soundFile, data.enabled, data.volume));
 			}
-
 			return items;
 		}
 
@@ -108,7 +101,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 		return [];
 	}
 
-	toggleShortcut(shortcut: string) {
+	toggleShortcut(shortcut: string): void {
 		const item = this.shortcuts.find(s => s.shortcut === shortcut);
 		if (item) {
 			item.enabled = !item.enabled;
@@ -117,7 +110,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 		}
 	}
 
-	updateVolume(shortcut: string, newVolume: number) {
+	updateVolume(shortcut: string, newVolume: number): void {
 		const item = this.shortcuts.find(s => s.shortcut === shortcut);
 		if (item) {
 			item.volume = Math.max(0, Math.min(1, newVolume));
@@ -126,7 +119,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 		}
 	}
 
-	updateSoundFile(shortcut: string, newFile: string) {
+	updateSoundFile(shortcut: string, newFile: string): void {
 		const item = this.shortcuts.find(s => s.shortcut === shortcut);
 		if (item) {
 			item.soundFile = newFile;
@@ -136,13 +129,13 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 		}
 	}
 
-	addShortcut(data: SoundShortcutData) {
+	addShortcut(data: SoundShortcut): void {
 		this.shortcuts.push(data);
 		this.saveShortcuts();
 		this._onDidChangeTreeData.fire();
 	}
 
-	removeShortcut(shortcut: string) {
+	removeShortcut(shortcut: string): void {
 		this.shortcuts = this.shortcuts.filter(s => s.shortcut !== shortcut);
 		this.saveShortcuts();
 		this.refresh();
@@ -156,11 +149,21 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 		return this.shortcuts;
 	}
 
-	private loadShortcuts() {
+	getEnabledShortcuts(): SoundShortcut[] {
+		return this.shortcuts.filter(s => s.enabled);
+	}
+
+	private loadShortcuts(): void {
 		if (fs.existsSync(SHORTCUTS_FILE)) {
 			try {
 				const data = fs.readFileSync(SHORTCUTS_FILE, 'utf-8');
-				this.shortcuts = JSON.parse(data);
+				const parsed: SoundShortcut[] = JSON.parse(data);
+				this.shortcuts = parsed.filter(entry =>
+					typeof entry.shortcut === 'string' &&
+					typeof entry.soundFile === 'string' &&
+					typeof entry.enabled === 'boolean' &&
+					typeof entry.volume === 'number'
+				);
 			} catch (error) {
 				console.error('Erreur lors du chargement des raccourcis :', error);
 				this.shortcuts = [];
@@ -168,9 +171,9 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 		}
 	}
 
-	private saveShortcuts() {
+	private saveShortcuts(): void {
 		try {
-			fs.writeFileSync(SHORTCUTS_FILE, JSON.stringify(this.shortcuts, null, 2));
+			fs.writeFileSync(SHORTCUTS_FILE, JSON.stringify(this.shortcuts, null, 2), 'utf-8');
 		} catch (error) {
 			console.error('Erreur lors de la sauvegarde des raccourcis :', error);
 		}
