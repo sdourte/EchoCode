@@ -115,7 +115,6 @@
       { "command": "echocode.shortcut.ctrlc", "title": "Shortcut CTRL+C" },
       { "command": "echocode.shortcut.ctrld", "title": "Shortcut CTRL+D" },
       { "command": "echocode.shortcut.ctrle", "title": "Shortcut CTRL+E" },
-      { "command": "echocode.shortcut.ctrlf", "title": "Shortcut CTRL+F" },
       { "command": "echocode.shortcut.ctrlg", "title": "Shortcut CTRL+G" },
       { "command": "echocode.shortcut.ctrlh", "title": "Shortcut CTRL+H" },
       { "command": "echocode.shortcut.ctrli", "title": "Shortcut CTRL+I" },
