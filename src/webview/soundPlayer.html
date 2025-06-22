@@ -129,7 +129,7 @@
 </head>
 <body>
   <h1>To-Do List</h1>
-  
+
   <div id="header">
     <div id="mode-label">Mode : Classique</div>
     <button id="switch-button" onclick="switchMode()">🔄</button>
@@ -145,7 +145,6 @@
   </div>
 
   <ul id="task-list"></ul>
-
   <div id="achievement-badge"></div>
 
   <script>
@@ -153,12 +152,13 @@
     const sounds = {};
     let interactionUnlocked = false;
     let preloadSoundList = [];
+    let mediaBaseUrl = '';
 
     let mode = "editable";
     let tasks = [];
 
     function playAchievementSound() {
-      const audio = new Audio('vscode-resource:media/levelup.mp3');
+      const audio = new Audio(`${mediaBaseUrl}levelup.mp3`);
       audio.volume = 1;
       audio.play().catch(() => {});
     }
@@ -169,17 +169,10 @@
       badge.style.display = "block";
       badge.style.opacity = "1";
 
-      // Affiche le badge pendant 2 secondes, puis commence à le faire disparaître
       setTimeout(() => {
-        badge.style.opacity = "0"; // Rend le badge invisible (via transition CSS)
-
-        // Après 300 ms (le temps que la transition d'opacité se termine),
-        // on le retire complètement de l'affichage
-        setTimeout(() => {
-          badge.style.display = "none";
-        }, 300); // ⬅️ Changer cette valeur pour modifier la durée de la disparition (fade out)
-
-      }, 3500); // ⬅️ Changer cette valeur pour modifier le temps d'affichage **avant** disparition
+        badge.style.opacity = "0";
+        setTimeout(() => { badge.style.display = "none"; }, 300);
+      }, 3500);
     }
 
     function renderTasks() {
@@ -189,7 +182,6 @@
       tasks.forEach((task, index) => {
         const item = document.createElement("li");
 
-        // ➤ Si c’est une tâche, on ajoute la checkbox
         if (task.type === 'task') {
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
@@ -197,7 +189,6 @@
           checkbox.onchange = () => {
             const wasDone = task.done;
             vscode.postMessage({ type: "toggleTask", index });
-
             if (!wasDone && checkbox.checked) {
               playAchievementSound();
               showAchievementBadge(task.text);
@@ -212,8 +203,6 @@
         const label = document.createElement("span");
         label.textContent = task.text;
         label.style.marginRight = "10px";
-
-        // ➤ Ligne barrée uniquement si c’est une tâche cochée
         if (task.type === 'task' && task.done) {
           label.style.textDecoration = "line-through";
         } else if (task.type === 'title') {
@@ -223,7 +212,6 @@
 
         item.appendChild(label);
 
-        // ➤ Actions (édition, suppression, déplacement) uniquement pour les tâches en mode editable
         if (mode === "editable") {
           const editButton = document.createElement("button");
           editButton.className = "icon";
@@ -275,9 +263,7 @@
         list.appendChild(item);
       });
 
-      const modeLabel = document.getElementById("mode-label");
-      modeLabel.textContent = `Mode : ${mode === 'editable' ? 'Classique' : 'Review'}`;
-
+      document.getElementById("mode-label").textContent = `Mode : ${mode === 'editable' ? 'Classique' : 'Review'}`;
       document.getElementById("add-task").style.display = (mode === "editable") ? "block" : "none";
       document.getElementById("import-container").style.display = (mode === "review") ? "block" : "none";
     }
@@ -287,10 +273,11 @@
     }
 
     window.addEventListener('message', event => {
-      const { type, sound, volume, enabled, preloadSounds, todo } = event.data;
+      const { type, sound, volume, enabled, preloadSounds, todo, mediaBaseUrl: baseUrl } = event.data;
 
       if (type === "init") {
         if (Array.isArray(preloadSounds)) preloadSoundList = preloadSounds;
+        if (baseUrl) mediaBaseUrl = baseUrl;
         if (todo) {
           mode = todo.mode;
           tasks = todo.tasks;
@@ -309,7 +296,7 @@
       if (!sound || !enabled) return;
 
       if (!sounds[sound]) {
-        sounds[sound] = new Audio(`vscode-resource:media/${sound}`);
+        sounds[sound] = new Audio(`${mediaBaseUrl}${sound}`);
       }
 
       const audio = sounds[sound];
@@ -322,7 +309,7 @@
       if (interactionUnlocked || preloadSoundList.length === 0) return;
       interactionUnlocked = true;
       for (const filename of preloadSoundList) {
-        const audio = new Audio(`vscode-resource:media/${filename}`);
+        const audio = new Audio(`${mediaBaseUrl}${filename}`);
         console.log(`Preloading sound: ${filename}`);
         audio.volume = 0;
         audio.play().catch(() => {});
@@ -351,8 +338,7 @@
         }
       });
 
-      const importBtn = document.getElementById("import-btn");
-      importBtn.addEventListener("click", () => {
+      document.getElementById("import-btn").addEventListener("click", () => {
         vscode.postMessage({ type: "importCustomTodo" });
       });
     });

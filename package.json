@@ -109,33 +109,68 @@
         "command": "echocode.changeRunSound",
         "title": "Changer le fichier son post-run",
         "category": "Run Sound"
-      }
+      },
+      { "command": "echocode.shortcut.ctrla", "title": "Shortcut CTRL+A" },
+      { "command": "echocode.shortcut.ctrlz", "title": "Shortcut CTRL+Z" },
+      { "command": "echocode.shortcut.ctrly", "title": "Shortcut CTRL+Y" },
+      { "command": "echocode.shortcut.ctrlc", "title": "Shortcut CTRL+C" },
+      { "command": "echocode.shortcut.ctrlv", "title": "Shortcut CTRL+V" },
+      { "command": "echocode.shortcut.ctrlx", "title": "Shortcut CTRL+X" },
+      { "command": "echocode.shortcut.ctrlf", "title": "Shortcut CTRL+F" },
+      { "command": "echocode.shortcut.ctrls", "title": "Shortcut CTRL+S" },
+      { "command": "echocode.shortcut.ctrlp", "title": "Shortcut CTRL+P" },
+      { "command": "echocode.shortcut.ctrln", "title": "Shortcut CTRL+N" }
     ],
     "keybindings": [
       {
         "key": "ctrl+c",
-        "command": "echocode.printCtrlC",
+        "command": "echocode.shortcut.ctrlc",
         "when": "editorTextFocus"
       },
       {
         "key": "ctrl+v",
-        "command": "echocode.printCtrlV",
+        "command": "echocode.shortcut.ctrlv",
         "when": "editorTextFocus"
       },
       {
         "key": "ctrl+x",
-        "command": "echocode.printCtrlX",
+        "command": "echocode.shortcut.ctrlx",
         "when": "editorTextFocus"
       },
       {
         "key": "ctrl+z",
-        "command": "echocode.printCtrlZ",
+        "command": "echocode.shortcut.ctrlz",
         "when": "editorTextFocus"
       },
       {
         "key": "ctrl+y",
-        "command": "echocode.printCtrlY",
+        "command": "echocode.shortcut.ctrly",
         "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+a",
+        "command": "echocode.shortcut.ctrla",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+f",
+        "command": "echocode.shortcut.ctrlf",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+s",
+        "command": "echocode.shortcut.ctrls",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+p",
+        "command": "echocode.shortcut.ctrlp",
+        "when": "!inQuickOpen && !inputFocus && !searchViewletVisible && !replaceWidgetVisible && !findWidgetVisible && !treeItemFocused && !treeItemHasChildFocused && !treeItemHasParentFocused && !treeItemHasSiblingFocused && !treeItemHasChildOrParentFocused && !treeItemHasSiblingOrParentFocused && !treeItemHasSiblingOrChildFocused"
+      },
+      {
+        "key": "ctrl+n",
+        "command": "echocode.shortcut.ctrln",
+        "when": "!inQuickOpen && !inputFocus && !searchViewletVisible && !replaceWidgetVisible && !findWidgetVisible"
       }
     ],
     "menus": {

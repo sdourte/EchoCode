@@ -1,32 +1,62 @@
 [
   {
-    "shortcut": "Ctrl+C",
+    "shortcut": "ctrl+c",
     "soundFile": "select_001.mp3",
     "enabled": true,
-    "volume": 1
+    "volume": 1.0
   },
   {
-    "shortcut": "Ctrl+V",
+    "shortcut": "ctrl+v",
     "soundFile": "select_002.mp3",
     "enabled": true,
-    "volume": 1
+    "volume": 1.0
   },
   {
-    "shortcut": "Ctrl+X",
+    "shortcut": "ctrl+x",
     "soundFile": "select_008.mp3",
     "enabled": true,
-    "volume": 1
+    "volume": 1.0
   },
   {
-    "shortcut": "Ctrl+Z",
+    "shortcut": "ctrl+z",
     "soundFile": "pluck_001.mp3",
     "enabled": true,
-    "volume": 1
+    "volume": 1.0
   },
   {
-    "shortcut": "Ctrl+Y",
+    "shortcut": "ctrl+y",
     "soundFile": "pluck_002.mp3",
     "enabled": true,
-    "volume": 1
+    "volume": 1.0
+  },
+    {
+    "shortcut": "ctrl+a",
+    "soundFile": "empty.mp3",
+    "enabled": false,
+    "volume": 1.0
+  },
+  {
+    "shortcut": "ctrl+f",
+    "soundFile": "empty.mp3",
+    "enabled": false,
+    "volume": 1.0
+  },
+  {
+    "shortcut": "ctrl+s",
+    "soundFile": "empty.mp3",
+    "enabled": false,
+    "volume": 1.0
+  },
+  {
+    "shortcut": "ctrl+p",
+    "soundFile": "empty.mp3",
+    "enabled": false,
+    "volume": 1.0
+  },
+  {
+    "shortcut": "ctrl+n",
+    "soundFile": "empty.mp3",
+    "enabled": false,
+    "volume": 1.0
   }
 ]
