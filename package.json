@@ -191,7 +191,6 @@
       { "key": "ctrl+c", "command": "echocode.shortcut.ctrlc", "when": "editorTextFocus" },
       { "key": "ctrl+d", "command": "echocode.shortcut.ctrld", "when": "editorTextFocus" },
       { "key": "ctrl+e", "command": "echocode.shortcut.ctrle", "when": "editorTextFocus" },
-      { "key": "ctrl+f", "command": "echocode.shortcut.ctrlf", "when": "editorTextFocus" },
       { "key": "ctrl+g", "command": "echocode.shortcut.ctrlg", "when": "editorTextFocus" },
       { "key": "ctrl+h", "command": "echocode.shortcut.ctrlh", "when": "editorTextFocus" },
       { "key": "ctrl+i", "command": "echocode.shortcut.ctrli", "when": "editorTextFocus" },

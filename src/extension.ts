@@ -316,6 +316,10 @@ export async function activate(context: vscode.ExtensionContext) {
 				if (existing.isVisible) {
 					vscode.window.showWarningMessage(`🔁 Le raccourci "${shortcut}" existe déjà et est actif.`);
 				} else {
+					if (shortcut.toLowerCase() === 'ctrl+f') {
+						vscode.window.showWarningMessage('❌ Impossible d\'assigner le raccourci "Ctrl+F".');
+						return;
+					}
 					soundTreeDataProvider.toggleVisibility(shortcut);
 					soundTreeDataProvider.updateSoundFile(shortcut, soundFile);
 					vscode.window.showInformationMessage(`✅ Raccourci "${shortcut}" réactivé avec ${soundFile}`);
