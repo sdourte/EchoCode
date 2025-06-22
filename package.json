@@ -155,7 +155,7 @@
       {
         "key": "ctrl+f",
         "command": "echocode.shortcut.ctrlf",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus || findWidgetVisible && !replaceWidgetVisible && !searchViewletVisible && !inQuickOpen && !inputFocus"
       },
       {
         "key": "ctrl+s",

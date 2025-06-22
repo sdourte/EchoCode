@@ -8,6 +8,7 @@ export interface ShortcutConfig {
   shortcut: string;
   soundFile: string;
   enabled: boolean;
+  isVisible: boolean;
   volume: number;
 }
 
@@ -82,7 +83,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
       const items: vscode.TreeItem[] = [new AddShortcutTreeItem()];
 
       for (const shortcut of this.shortcuts) {
-        if (shortcut.enabled && shortcut.soundFile !== 'empty.mp3') {
+        if (shortcut.isVisible) {
           items.push(new SoundTreeItem(shortcut.shortcut, shortcut));
         }
       }
@@ -104,6 +105,15 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
     const found = this.shortcuts.find(s => s.shortcut === shortcut);
     if (found) {
       found.enabled = !found.enabled;
+      this.saveShortcuts();
+      this.refresh();
+    }
+  }
+
+  toggleVisibility(shortcut: string) {
+    const found = this.shortcuts.find(s => s.shortcut === shortcut);
+    if (found) {
+      found.isVisible = !found.isVisible;
       this.saveShortcuts();
       this.refresh();
     }
@@ -137,8 +147,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
   removeShortcut(shortcut: string) {
     const found = this.shortcuts.find(s => s.shortcut === shortcut);
     if (found) {
-      found.soundFile = 'empty.mp3';
-      found.enabled = false;
+      found.isVisible = false;
       this.saveShortcuts();
       this.refresh();
     }
@@ -158,7 +167,10 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
         const raw = fs.readFileSync(SHORTCUTS_FILE, 'utf-8');
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          this.shortcuts = parsed;
+          this.shortcuts = parsed.map((s: any) => ({
+            ...s,
+            isVisible: typeof s.isVisible === 'boolean' ? s.isVisible : true
+          }));
         } else {
           console.error('❌ Format JSON invalide : attendu un tableau');
           this.shortcuts = [];

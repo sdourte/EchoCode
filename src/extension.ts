@@ -170,10 +170,15 @@ export async function activate(context: vscode.ExtensionContext) {
 	statusBarItem.command = 'echocode.start';
 	statusBarItem.show();
 
+	const EMPTY_SOUND = "empty.mp3";
+
+	// Après getAllShortcuts, filtre uniquement les raccourcis visibles
 	const shortcuts = soundTreeDataProvider.getAllShortcuts();
-	const keybindingMap = await buildKeybindingMap();
 
 	console.log("SHORTCUTS LOADED:", shortcuts);
+
+	// Mapping des raccourcis aux commandes
+	const keybindingMap = await buildKeybindingMap();
 
 	const dynamicShortcutCommands = shortcuts.map((item) => {
 		const normalized = item.shortcut
@@ -183,36 +188,39 @@ export async function activate(context: vscode.ExtensionContext) {
 			.replace(/[^a-zA-Z0-9]/g, '');
 
 		const commandId = `echocode.shortcut.${normalized.toLowerCase()}`;
-		console.log(`🛠 Enregistrement du raccourci : ${item.shortcut} → ${commandId}`);
 
 		const command = vscode.commands.registerCommand(commandId, async () => {
 			console.log(`✅ Commande déclenchée : ${commandId}`);
-			
-			if (item.config.soundFile === 'empty.mp3') {
-			console.log(`🎵 ${item.shortcut} désactivé.`);
-			return;
+
+			const config = soundTreeDataProvider.getShortcut(item.shortcut);
+			if (!config) {
+				console.warn(`⚠️ Aucune config trouvée pour ${item.shortcut}`);
+				return;
 			}
 
-			vscode.window.showInformationMessage(`🎵 ${item.shortcut} → ${item.config.soundFile}`);
-			playSoundWebview(item.config.soundFile, item.config.enabled, item.config.volume);
+			const soundFile = config.soundFile || EMPTY_SOUND;
+			const visible = config.isVisible;
+			const enabled = config.enabled;
+			const volume = config.volume ?? 1;
 
-			const shortcut = item.shortcut.toLowerCase().trim();
-			const editorCommand = keybindingMap[shortcut]?.find(cmd => cmd.includes("editor"));
+			// ▶️ Toujours jouer un son (silencieux ou non)
+			playSoundWebview(soundFile, enabled, volume);
 
+			// 🎯 Exécuter la commande réelle (VSCode)
+			const shortcutKey = item.shortcut.toLowerCase().trim();
+			const editorCommand = keybindingMap[shortcutKey]?.find(cmd => cmd.includes("editor"));
 			if (editorCommand) {
-			console.log(`🧭 Commande VSCode liée trouvée : ${editorCommand}`);
-			await vscode.commands.executeCommand(editorCommand);
+				console.log(`🧭 Commande VSCode liée trouvée : ${editorCommand}`);
+				await vscode.commands.executeCommand(editorCommand);
 			} else {
-			console.log(`🪂 Fallback : aucune commande éditeur pour ${shortcut}`);
-			await runDefaultCommandsForKey(item.shortcut, keybindingMap);
+				console.log(`🪂 Fallback : aucune commande éditeur pour ${shortcutKey}`);
+				await runDefaultCommandsForKey(item.shortcut, keybindingMap);
 			}
 		});
 
 		context.subscriptions.push(command);
 		return command;
 	});
-
-	const EMPTY_SOUND = "empty.mp3";
 
 	const treeViewCommands = [
 		vscode.commands.registerCommand('echocode.toggleEnabled', (item: SoundTreeItem) => {
@@ -295,16 +303,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			const existing = soundTreeDataProvider.getShortcut(shortcut);
 			if (existing) {
-				if (existing.soundFile !== EMPTY_SOUND) {
-					vscode.window.showWarningMessage(`🔁 Le raccourci "${shortcut}" a déjà un son : ${existing.soundFile}`);
+				if (existing.isVisible) {
+					vscode.window.showWarningMessage(`🔁 Le raccourci "${shortcut}" existe déjà et est actif.`);
 				} else {
+					soundTreeDataProvider.toggleVisibility(shortcut);
 					soundTreeDataProvider.updateSoundFile(shortcut, soundFile);
-					vscode.window.showInformationMessage(`✅ Raccourci réactivé avec le son : ${soundFile}`);
+					vscode.window.showInformationMessage(`✅ Raccourci "${shortcut}" réactivé avec ${soundFile}`);
 				}
 			} else {
 				soundTreeDataProvider.addShortcut(shortcut, {
 					soundFile,
 					enabled: true,
+					isVisible: true,
 					volume: 1.0
 				});
 				vscode.window.showInformationMessage(`✅ Nouveau raccourci ajouté : ${shortcut}`);
@@ -315,14 +325,15 @@ export async function activate(context: vscode.ExtensionContext) {
 			if (!item) {return;}
 
 			const confirm = await vscode.window.showWarningMessage(
-				`Désactiver le raccourci "${item.shortcut}" (remettre son vide) ?`,
+				`Supprimer le raccourci "${item.shortcut}" ? (il sera masqué, pas supprimé du fichier)`,
 				{ modal: true },
 				'Oui'
 			);
 
 			if (confirm === 'Oui') {
-				soundTreeDataProvider.updateSoundFile(item.shortcut, EMPTY_SOUND);
-				vscode.window.showInformationMessage(`❌ Raccourci désactivé : ${item.shortcut}`);
+				soundTreeDataProvider.toggleVisibility(item.shortcut);
+				item.config.soundFile = EMPTY_SOUND; // Réinitialise le son
+				vscode.window.showInformationMessage(`❌ Raccourci masqué : ${item.shortcut}`);
 			}
 		}),
 
