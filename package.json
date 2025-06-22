@@ -87,27 +87,27 @@
       },
       {
         "command": "echocode.playRunSound",
-        "title": "Jouer un son post-run",
+        "title": "Jouer un son terminal",
         "category": "Run Sound"
       },
       {
         "command": "echocode.increaseRunVolume",
-        "title": "Augmenter le volume post-run",
+        "title": "Augmenter le volume",
         "category": "Run Sound"
       },
       {
         "command": "echocode.decreaseRunVolume",
-        "title": "Diminuer le volume post-run",
+        "title": "Diminuer le volume",
         "category": "Run Sound"
       },
       {
         "command": "echocode.toggleRunSound",
-        "title": "Activer/Désactiver le son post-run",
+        "title": "Activer/Désactiver le son",
         "category": "Run Sound"
       },
       {
         "command": "echocode.changeRunSound",
-        "title": "Changer le fichier son post-run",
+        "title": "Changer le fichier son",
         "category": "Run Sound"
       },
       {
@@ -185,7 +185,7 @@
       {
         "key": "ctrl+f",
         "command": "echocode.shortcut.ctrlf",
-        "when": "editorTextFocus || findWidgetVisible && !replaceWidgetVisible && !searchViewletVisible && !inQuickOpen && !inputFocus"
+        "when": "editorTextFocus"
       },
       {
         "key": "ctrl+s",

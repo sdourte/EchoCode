@@ -126,16 +126,26 @@ function createOrShowSoundWebView(context: vscode.ExtensionContext) {
 					}
 				});
 				break;
+			case 'soundActivationConfirmed':
+				vscode.window.showInformationMessage("🔊 Sons activés !");
+				break;
+
 		}
 	});
 }
 
-function playSoundWebview(soundFile: string, enabled: boolean, volume: number) {
+function playSoundWebview(shortcut: string, soundFile: string, enabled: boolean, volume: number) {
 	if (soundWebviewPanel) {
 		if (enabled) {
 			soundWebviewPanel.webview.postMessage({ sound: soundFile, enabled, volume });
-		} else {
-			vscode.window.showWarningMessage(`Le son \"${soundFile}\" est désactivé.`);
+		} 
+		else {
+			if (shortcut !== '') {
+			vscode.window.showWarningMessage(`Le son du raccourci \"${shortcut}\" est désactivé.`);
+			}
+			else {
+				vscode.window.showWarningMessage(`Le son du raccourci est désactivé.`);
+			}
 		}
 	}
 }
@@ -204,7 +214,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const volume = config.volume ?? 1;
 
 			// ▶️ Toujours jouer un son (silencieux ou non)
-			playSoundWebview(soundFile, enabled, volume);
+			playSoundWebview(item.shortcut, soundFile, enabled, volume);
 
 			// 🎯 Exécuter la commande réelle (VSCode)
 			const shortcutKey = item.shortcut.toLowerCase().trim();
@@ -339,13 +349,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		vscode.commands.registerCommand('echocode.playShortcutSound', (item: SoundTreeItem) => {
 			if (!item) {return;}
-			playSoundWebview(item.config.soundFile, item.config.enabled, item.config.volume);
+			playSoundWebview(item.shortcut, item.config.soundFile, item.config.enabled, item.config.volume);
 		})
 	];
 
 	const runSoundCommands = [
 		vscode.commands.registerCommand('echocode.playRunSound', (item: RunSoundTreeItem2) => {
-			playSoundWebview(item.soundFile, item.enabled, item.volume);
+			playSoundWebview('', item.soundFile, item.enabled, item.volume);
 		}),
 		vscode.commands.registerCommand('echocode.increaseRunVolume', (item: RunSoundTreeItem2) => {
 			runSoundProvider.updateVolume(item.type, item.volume + 0.1);
@@ -418,7 +428,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		const type: RunSoundType = success ? 'success' : 'error';
 		const runSound = runSoundProvider.getAll().find(s => s.type === type);
 		if (runSound && runSound.enabled) {
-			playSoundWebview(runSound.soundFile, runSound.enabled, runSound.volume);
+			playSoundWebview('', runSound.soundFile, runSound.enabled, runSound.volume);
 		}
 		event.terminal.show(false);
 	});

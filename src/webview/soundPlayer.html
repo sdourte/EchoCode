@@ -315,6 +315,7 @@
         audio.play().catch(() => {});
         sounds[filename] = audio;
       }
+      vscode.postMessage({ type: 'soundActivationConfirmed' });
     });
 
     document.addEventListener("DOMContentLoaded", () => {
