@@ -110,16 +110,46 @@
         "title": "Changer le fichier son post-run",
         "category": "Run Sound"
       },
-      { "command": "echocode.shortcut.ctrla", "title": "Shortcut CTRL+A" },
-      { "command": "echocode.shortcut.ctrlz", "title": "Shortcut CTRL+Z" },
-      { "command": "echocode.shortcut.ctrly", "title": "Shortcut CTRL+Y" },
-      { "command": "echocode.shortcut.ctrlc", "title": "Shortcut CTRL+C" },
-      { "command": "echocode.shortcut.ctrlv", "title": "Shortcut CTRL+V" },
-      { "command": "echocode.shortcut.ctrlx", "title": "Shortcut CTRL+X" },
-      { "command": "echocode.shortcut.ctrlf", "title": "Shortcut CTRL+F" },
-      { "command": "echocode.shortcut.ctrls", "title": "Shortcut CTRL+S" },
-      { "command": "echocode.shortcut.ctrlp", "title": "Shortcut CTRL+P" },
-      { "command": "echocode.shortcut.ctrln", "title": "Shortcut CTRL+N" }
+      {
+        "command": "echocode.shortcut.ctrla",
+        "title": "Shortcut CTRL+A"
+      },
+      {
+        "command": "echocode.shortcut.ctrlz",
+        "title": "Shortcut CTRL+Z"
+      },
+      {
+        "command": "echocode.shortcut.ctrly",
+        "title": "Shortcut CTRL+Y"
+      },
+      {
+        "command": "echocode.shortcut.ctrlc",
+        "title": "Shortcut CTRL+C"
+      },
+      {
+        "command": "echocode.shortcut.ctrlv",
+        "title": "Shortcut CTRL+V"
+      },
+      {
+        "command": "echocode.shortcut.ctrlx",
+        "title": "Shortcut CTRL+X"
+      },
+      {
+        "command": "echocode.shortcut.ctrlf",
+        "title": "Shortcut CTRL+F"
+      },
+      {
+        "command": "echocode.shortcut.ctrls",
+        "title": "Shortcut CTRL+S"
+      },
+      {
+        "command": "echocode.shortcut.ctrlp",
+        "title": "Shortcut CTRL+P"
+      },
+      {
+        "command": "echocode.shortcut.ctrln",
+        "title": "Shortcut CTRL+N"
+      }
     ],
     "keybindings": [
       {
@@ -212,9 +242,8 @@
   },
   "scripts": {
     "copy:data": "npx cpy src/data/**/* out/data --parents",
-    "update:keybindings": "node out/scripts/updateKeybindings.js",
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./ && npm run copy:data && npm run update:keybindings",
+    "compile": "tsc -p ./ && npm run copy:data",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
