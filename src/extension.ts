@@ -174,11 +174,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.executeCommand('echocode.start');
 
-	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-	statusBarItem.text = '$(unmute) EchoCode';
-	statusBarItem.tooltip = 'Ouvrir EchoCode';
-	statusBarItem.command = 'echocode.start';
-	statusBarItem.show();
+	const todoStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+	todoStatusBarItem.text = '$(unmute) Ouvrir To-Do List';
+	todoStatusBarItem.tooltip = 'Ouvrir To-Do List EchoCode';
+	todoStatusBarItem.command = 'echocode.start';
+	todoStatusBarItem.show();
 
 	const EMPTY_SOUND = "empty.mp3";
 
