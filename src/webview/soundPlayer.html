@@ -275,6 +275,8 @@
     window.addEventListener('message', event => {
       const { type, sound, volume, enabled, preloadSounds, todo, mediaBaseUrl: baseUrl } = event.data;
 
+      console.log('[EchoCode Webview] 📩 Message reçu :', event.data); // <-- AJOUT 1
+
       if (type === "init") {
         if (Array.isArray(preloadSounds)) preloadSoundList = preloadSounds;
         if (baseUrl) mediaBaseUrl = baseUrl;
@@ -293,16 +295,24 @@
         return;
       }
 
-      if (!sound || !enabled) return;
+      if (!sound || !enabled) {
+        console.warn('[EchoCode Webview] ❌ Son ignoré (manquant ou désactivé)', { sound, enabled }); // <-- AJOUT 2
+        return;
+      }
+
+      const fullUrl = `${mediaBaseUrl}${sound}`;
+      console.log(`[EchoCode Webview] 🔊 Tentative de lecture du son : ${fullUrl} (volume: ${volume})`); // <-- AJOUT 3
 
       if (!sounds[sound]) {
-        sounds[sound] = new Audio(`${mediaBaseUrl}${sound}`);
+        sounds[sound] = new Audio(fullUrl);
       }
 
       const audio = sounds[sound];
       audio.volume = volume;
       audio.currentTime = 0;
-      audio.play().catch(() => {});
+      audio.play()
+        .then(() => console.log(`[EchoCode Webview] ✅ Lecture réussie : ${sound}`)) // <-- AJOUT 4
+        .catch(err => console.error(`[EchoCode Webview] ❌ Erreur lors de la lecture : ${sound}`, err)); // <-- AJOUT 5
     });
 
     window.addEventListener('click', () => {
