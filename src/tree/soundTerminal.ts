@@ -43,7 +43,9 @@ export class RunSoundTreeItem2 extends vscode.TreeItem {
 État : ${enabled ? 'Activé' : 'Désactivé'}
 Volume : ${Math.round(volume * 100)}%`;
 
-		this.description = `${enabled ? '🔊' : '🔇'} • ${Math.round(volume * 100)}%`;
+		if (!isVolumeControl) {
+			this.description = `${enabled ? '🔊' : '🔇'} • ${Math.round(volume * 100)}%`;
+		}
 
 		this.command = {
 			command: isVolumeControl
