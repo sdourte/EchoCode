@@ -61,7 +61,7 @@ Volume : ${Math.round(volume * 100)}%`;
 
 export class RunPythonTreeItem extends vscode.TreeItem {
 	constructor() {
-		super('Exécuter Python', vscode.TreeItemCollapsibleState.None);
+		super('Exécuter', vscode.TreeItemCollapsibleState.None);
 		this.command = {
 			command: 'echocode.runPythonWithSound',
 			title: 'Exécuter Python avec son'

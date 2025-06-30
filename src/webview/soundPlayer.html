@@ -295,6 +295,24 @@
         return;
       }
 
+      if (type === "newSoundImported") {
+        console.log(`[EchoCode Webview] 📦 Nouveau son importé : ${sound}`);
+        if (!preloadSoundList.includes(sound)) {
+          preloadSoundList.push(sound);
+        }
+
+        if (interactionUnlocked) {
+          const audio = new Audio(`${mediaBaseUrl}${sound}`);
+          audio.volume = 0;
+          audio.play()
+            .then(() => console.log(`[EchoCode Webview] ✅ Son importé préchargé : ${sound}`))
+            .catch(err => console.warn(`[EchoCode Webview] ⚠️ Échec de préchargement pour ${sound}`, err));
+          sounds[sound] = audio;
+        }
+
+        return;
+      }
+
       if (!sound || !enabled) {
         console.warn('[EchoCode Webview] ❌ Son ignoré (manquant ou désactivé)', { sound, enabled }); // <-- AJOUT 2
         return;

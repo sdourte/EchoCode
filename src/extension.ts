@@ -322,7 +322,7 @@ export async function activate(context: vscode.ExtensionContext) {
 					}
 					soundTreeDataProvider.toggleVisibility(shortcut);
 					soundTreeDataProvider.updateSoundFile(shortcut, soundFile);
-					vscode.window.showInformationMessage(`✅ Raccourci "${shortcut}" réactivé avec ${soundFile}`);
+					vscode.window.showInformationMessage(`✅ Raccourci "${shortcut}" activé avec ${soundFile}`);
 				}
 			} else {
 				soundTreeDataProvider.addShortcut(shortcut, {
@@ -410,12 +410,16 @@ export async function activate(context: vscode.ExtensionContext) {
 		try {
 			fs.copyFileSync(sourcePath, destPath);
 			vscode.window.showInformationMessage(`✅ Son "${fileName}" importé avec succès !`);
+			vscode.window.showInformationMessage(`Cliquez sur la to-do list pour l'activer dans vos raccourcis.`);
 
 			// Si la WebView est ouverte, on l'informe d'un nouveau son
 			if (soundWebviewPanel) {
 				soundWebviewPanel.webview.postMessage({
 					type: 'newSoundImported',
-					sound: fileName
+					sound: fileName,
+					mediaBaseUrl: soundWebviewPanel.webview.asWebviewUri(
+						vscode.Uri.file(path.join(context.extensionPath, 'media'))
+					).toString() + '/'
 				});
 			}
 		} catch (err) {

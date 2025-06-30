@@ -53,6 +53,8 @@ Contactez le propriétaire de l’extension EchoCode
 
 ## 📎 Modules nécessaires (inclus dans l'extension)
 
+> Tout est déjà installé dans l'extension et donc dans le fichier .vsix.
+
 | Dépendance           | Inclus ?  |
 |----------------------|-----------|
 | `vscode` API         | ✅ Oui    |
