@@ -425,17 +425,43 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(importSoundCommand);
 
-
-	vscode.window.onDidEndTerminalShellExecution((event) => {
-		const exitCode = event.exitCode;
-		const success = exitCode === 0;
-		const type: RunSoundType = success ? 'success' : 'error';
-		const runSound = runSoundProvider.getAll().find(s => s.type === type);
-		if (runSound && runSound.enabled) {
-			playSoundWebview('', runSound.soundFile, runSound.enabled, runSound.volume);
+	const runPythonWithSoundCommand = vscode.commands.registerCommand('echocode.runPythonWithSound', async () => {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			vscode.window.showErrorMessage("Aucun fichier ouvert.");
+			return;
 		}
-		event.terminal.show(false);
+
+		const filePath = editor.document.fileName;
+		const taskName = 'Run Python with Sound';
+
+		const task = new vscode.Task(
+			{ type: 'shell' },
+			vscode.TaskScope.Workspace,
+			taskName,
+			'EchoCode',
+			new vscode.ShellExecution(`python "${filePath}"`)
+		);
+
+		const disposable = vscode.tasks.onDidEndTaskProcess((e) => {
+			if (e.execution.task.name === taskName) {
+				if (e.exitCode === 0) {
+					vscode.window.showInformationMessage("Script terminé avec succès !");
+					playSoundWebview('', 'success.mp3', true, 1.0);
+				} else {
+					vscode.window.showErrorMessage("Erreur lors de l'exécution du script.");
+					playSoundWebview('', 'error.mp3', true, 1.0);
+				}
+				disposable.dispose();
+			}
+		});
+
+		vscode.tasks.executeTask(task);
 	});
+
+	context.subscriptions.push(runPythonWithSoundCommand);
+
+
 
 	[...treeViewCommands, ...runSoundCommands].forEach(cmd => context.subscriptions.push(cmd));
 }

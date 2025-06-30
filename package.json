@@ -110,6 +110,11 @@
         "title": "Changer le fichier son",
         "category": "Run Sound"
       },
+      {
+        "command": "echocode.runPythonWithSound",
+        "title": "Exécuter Python avec son",
+        "category": "Run Sound"
+      },
       { "command": "echocode.shortcut.ctrla", "title": "Shortcut CTRL+A" },
       { "command": "echocode.shortcut.ctrlb", "title": "Shortcut CTRL+B" },
       { "command": "echocode.shortcut.ctrlc", "title": "Shortcut CTRL+C" },

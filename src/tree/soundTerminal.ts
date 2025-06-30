@@ -57,7 +57,19 @@ Volume : ${Math.round(volume * 100)}%`;
 	}
 }
 
-export class RunSoundTreeDataProvider2 implements vscode.TreeDataProvider<RunSoundTreeItem2> {
+export class RunPythonTreeItem extends vscode.TreeItem {
+	constructor() {
+		super('Exécuter Python', vscode.TreeItemCollapsibleState.None);
+		this.command = {
+			command: 'echocode.runPythonWithSound',
+			title: 'Exécuter Python avec son'
+		};
+		this.contextValue = 'runPython';
+		this.iconPath = new vscode.ThemeIcon('play');
+		this.tooltip = "Exécute le script Python actif et joue un son à la fin.";
+	}
+}
+export class RunSoundTreeDataProvider2 implements vscode.TreeDataProvider<vscode.TreeItem> {
 	private _onDidChangeTreeData: vscode.EventEmitter<RunSoundTreeItem2 | undefined | void> = new vscode.EventEmitter();
 	readonly onDidChangeTreeData: vscode.Event<RunSoundTreeItem2 | undefined | void> = this._onDidChangeTreeData.event;
 
@@ -71,15 +83,23 @@ export class RunSoundTreeDataProvider2 implements vscode.TreeDataProvider<RunSou
 		this._onDidChangeTreeData.fire();
 	}
 
-	getTreeItem(element: RunSoundTreeItem2): vscode.TreeItem {
+	getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
 		return element;
 	}
 
-	getChildren(element?: RunSoundTreeItem2): vscode.ProviderResult<RunSoundTreeItem2[]> {
+	getChildren(element?: RunSoundTreeItem2): vscode.ProviderResult<(RunSoundTreeItem2 | RunPythonTreeItem)[]> {
 		if (!element) {
-			return this.runSounds.map(s =>
+			const items: (RunSoundTreeItem2 | RunPythonTreeItem)[] = [];
+
+			// 👇 Ajouter le bouton "Exécuter Python avec son" tout en haut
+			items.push(new RunPythonTreeItem());
+
+			// 🔊 Ajouter les sons post run
+			items.push(...this.runSounds.map(s =>
 				new RunSoundTreeItem2(s.type, s.soundFile, s.enabled, s.volume)
-			);
+			));
+
+			return items;
 		}
 
 		if (!element.isVolumeControl) {
