@@ -138,6 +138,7 @@ function playSoundWebview(shortcut: string, soundFile: string, enabled: boolean,
 	if (soundWebviewPanel) {
 		if (enabled) {
 			soundWebviewPanel.webview.postMessage({ sound: soundFile, enabled, volume });
+			console.log(`🔊 Son joué pour le raccourci "${shortcut}": ${soundFile} (Volume: ${volume})`);
 		} 
 		else {
 			if (shortcut !== '') {
@@ -182,14 +183,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	const EMPTY_SOUND = "empty.mp3";
 
-	// Après getAllShortcuts, filtre uniquement les raccourcis visibles
-	const shortcuts = soundTreeDataProvider.getAllShortcuts();
+	const mappingPath = path.join(context.extensionPath, 'src', 'data', 'nativeCommandMap.json');
+	const rawMap = fs.readFileSync(mappingPath, 'utf-8');
+	const nativeCommandMap: Record<string, string> = JSON.parse(rawMap);
 
+	// --- Récupération des raccourcis visibles depuis la TreeView ---
+	const shortcuts = soundTreeDataProvider.getAllShortcuts();
 	console.log("SHORTCUTS LOADED:", shortcuts);
 
-	// Mapping des raccourcis aux commandes
-	const keybindingMap = await buildKeybindingMap();
-
+	// --- Enregistrement dynamique des commandes ---
 	const dynamicShortcutCommands = shortcuts.map((item) => {
 		const normalized = item.shortcut
 			.replace(/\+/g, '')
@@ -209,22 +211,20 @@ export async function activate(context: vscode.ExtensionContext) {
 			}
 
 			const soundFile = config.soundFile || EMPTY_SOUND;
-			const visible = config.isVisible;
+			//const visible = config.isVisible;
 			const enabled = config.enabled;
 			const volume = config.volume ?? 1;
 
-			// ▶️ Toujours jouer un son (silencieux ou non)
+			// ▶️ Jouer un son
 			playSoundWebview(item.shortcut, soundFile, enabled, volume);
 
-			// 🎯 Exécuter la commande réelle (VSCode)
-			const shortcutKey = item.shortcut.toLowerCase().trim();
-			const editorCommand = keybindingMap[shortcutKey]?.find(cmd => cmd.includes("editor"));
-			if (editorCommand) {
-				console.log(`🧭 Commande VSCode liée trouvée : ${editorCommand}`);
-				await vscode.commands.executeCommand(editorCommand);
+			// 🎯 Exécuter la commande native correspondante
+			const native = nativeCommandMap[commandId];
+			if (native) {
+				console.log(`🔄 Exécution commande native : ${native}`);
+				await vscode.commands.executeCommand(native);
 			} else {
-				console.log(`🪂 Fallback : aucune commande éditeur pour ${shortcutKey}`);
-				await runDefaultCommandsForKey(item.shortcut, keybindingMap);
+				console.log(`⚠️ Aucune commande native associée pour ${commandId}`);
 			}
 		});
 
@@ -316,10 +316,10 @@ export async function activate(context: vscode.ExtensionContext) {
 				if (existing.isVisible) {
 					vscode.window.showWarningMessage(`🔁 Le raccourci "${shortcut}" existe déjà et est actif.`);
 				} else {
-					if (shortcut.toLowerCase() === 'ctrl+f') {
+					/*if (shortcut.toLowerCase() === 'ctrl+f') {
 						vscode.window.showWarningMessage('❌ Impossible d\'assigner le raccourci "Ctrl+F".');
 						return;
-					}
+					}*/
 					soundTreeDataProvider.toggleVisibility(shortcut);
 					soundTreeDataProvider.updateSoundFile(shortcut, soundFile);
 					vscode.window.showInformationMessage(`✅ Raccourci "${shortcut}" activé avec ${soundFile}`);
@@ -410,7 +410,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		try {
 			fs.copyFileSync(sourcePath, destPath);
 			vscode.window.showInformationMessage(`✅ Son "${fileName}" importé avec succès !`);
-			vscode.window.showInformationMessage(`Cliquez sur la to-do list pour l'activer dans vos raccourcis.`);
 
 			// Si la WebView est ouverte, on l'informe d'un nouveau son
 			if (soundWebviewPanel) {
