@@ -244,7 +244,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			if (!item) {return;}
 
 			const mediaFolder = path.join(context.extensionPath, 'media');
-			const files = fs.readdirSync(mediaFolder).filter(f => f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg'));
+			const files = fs.readdirSync(mediaFolder).filter(f => f.endsWith('.mp3'));
 
 			const selected = await vscode.window.showQuickPick(files, {
 				placeHolder: 'Choisissez un nouveau son pour ce raccourci'

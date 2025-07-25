@@ -29,12 +29,12 @@
       "echocode": [
         {
           "id": "soundExplorer",
-          "name": "Sound Shortcuts",
+          "name": "Sons de Raccourcis",
           "icon": "media/icon.svg"
         },
         {
           "id": "runSounds",
-          "name": "Run Sounds",
+          "name": "Sons d'Exécution",
           "icon": "media/icon.svg"
         }
       ]

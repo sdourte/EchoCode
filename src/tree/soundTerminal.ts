@@ -27,8 +27,8 @@ export class RunSoundTreeItem2 extends vscode.TreeItem {
 				: isVolumeControl === 'decrease'
 				? 'Diminuer le volume'
 				: type === 'success'
-					? '▶️ Terminal réussi'
-					: '❌ Terminal échoué',
+					? '▶️ Exécution réussie'
+					: '❌ Exécution échouée',
 			isVolumeControl ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed
 		);
 
