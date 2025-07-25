@@ -87,56 +87,116 @@
       },
       {
         "command": "echocode.playRunSound",
-        "title": "Jouer un son post-run",
+        "title": "Jouer un son terminal",
         "category": "Run Sound"
       },
       {
         "command": "echocode.increaseRunVolume",
-        "title": "Augmenter le volume post-run",
+        "title": "Augmenter le volume",
         "category": "Run Sound"
       },
       {
         "command": "echocode.decreaseRunVolume",
-        "title": "Diminuer le volume post-run",
+        "title": "Diminuer le volume",
         "category": "Run Sound"
       },
       {
         "command": "echocode.toggleRunSound",
-        "title": "Activer/Désactiver le son post-run",
+        "title": "Activer/Désactiver le son",
         "category": "Run Sound"
       },
       {
         "command": "echocode.changeRunSound",
-        "title": "Changer le fichier son post-run",
+        "title": "Changer le fichier son",
         "category": "Run Sound"
-      }
+      },
+      {
+        "command": "echocode.runPythonWithSound",
+        "title": "Exécuter Python avec son",
+        "category": "Run Sound"
+      },
+      { "command": "echocode.shortcut.ctrla", "title": "Shortcut CTRL+A" },
+      { "command": "echocode.shortcut.ctrlb", "title": "Shortcut CTRL+B" },
+      { "command": "echocode.shortcut.ctrlc", "title": "Shortcut CTRL+C" },
+      { "command": "echocode.shortcut.ctrld", "title": "Shortcut CTRL+D" },
+      { "command": "echocode.shortcut.ctrle", "title": "Shortcut CTRL+E" },
+      { "command": "echocode.shortcut.ctrlf", "title": "Shortcut CTRL+F" },
+      { "command": "echocode.shortcut.ctrlg", "title": "Shortcut CTRL+G" },
+      { "command": "echocode.shortcut.ctrlh", "title": "Shortcut CTRL+H" },
+      { "command": "echocode.shortcut.ctrli", "title": "Shortcut CTRL+I" },
+      { "command": "echocode.shortcut.ctrlj", "title": "Shortcut CTRL+J" },
+      { "command": "echocode.shortcut.ctrlk", "title": "Shortcut CTRL+K" },
+      { "command": "echocode.shortcut.ctrll", "title": "Shortcut CTRL+L" },
+      { "command": "echocode.shortcut.ctrlm", "title": "Shortcut CTRL+M" },
+      { "command": "echocode.shortcut.ctrln", "title": "Shortcut CTRL+N" },
+      { "command": "echocode.shortcut.ctrlo", "title": "Shortcut CTRL+O" },
+      { "command": "echocode.shortcut.ctrlp", "title": "Shortcut CTRL+P" },
+      { "command": "echocode.shortcut.ctrlq", "title": "Shortcut CTRL+Q" },
+      { "command": "echocode.shortcut.ctrlr", "title": "Shortcut CTRL+R" },
+      { "command": "echocode.shortcut.ctrls", "title": "Shortcut CTRL+S" },
+      { "command": "echocode.shortcut.ctrlt", "title": "Shortcut CTRL+T" },
+      { "command": "echocode.shortcut.ctrlu", "title": "Shortcut CTRL+U" },
+      { "command": "echocode.shortcut.ctrlv", "title": "Shortcut CTRL+V" },
+      { "command": "echocode.shortcut.ctrlw", "title": "Shortcut CTRL+W" },
+      { "command": "echocode.shortcut.ctrlx", "title": "Shortcut CTRL+X" },
+      { "command": "echocode.shortcut.ctrly", "title": "Shortcut CTRL+Y" },
+      { "command": "echocode.shortcut.ctrlz", "title": "Shortcut CTRL+Z" },
+      { "command": "echocode.shortcut.ctrltab", "title": "Shortcut CTRL+TAB" },
+      { "command": "echocode.shortcut.ctrlshifttab", "title": "Shortcut CTRL+SHIFT+TAB" },
+      { "command": "echocode.shortcut.ctrl`", "title": "Shortcut CTRL+`" },
+      { "command": "echocode.shortcut.ctrlhome", "title": "Shortcut CTRL+HOME" },
+      { "command": "echocode.shortcut.ctrlend", "title": "Shortcut CTRL+END" },
+      { "command": "echocode.shortcut.ctrlleft", "title": "Shortcut CTRL+LEFT" },
+      { "command": "echocode.shortcut.ctrlright", "title": "Shortcut CTRL+RIGHT" },
+      { "command": "echocode.shortcut.ctrlbackspace", "title": "Shortcut CTRL+BACKSPACE" },
+      { "command": "echocode.shortcut.ctrldelete", "title": "Shortcut CTRL+DELETE" },
+      { "command": "echocode.shortcut.ctrlshiftl", "title": "Shortcut CTRL+SHIFT+L" },
+      { "command": "echocode.shortcut.ctrlshiftk", "title": "Shortcut CTRL+SHIFT+K" },
+      { "command": "echocode.shortcut.ctrlenter", "title": "Shortcut CTRL+ENTER" },
+      { "command": "echocode.shortcut.ctrlshiftenter", "title": "Shortcut CTRL+SHIFT+ENTER" },
+      { "command": "echocode.shortcut.ctrlspace", "title": "Shortcut CTRL+SPACE" }
     ],
     "keybindings": [
-      {
-        "key": "ctrl+c",
-        "command": "echocode.printCtrlC",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+v",
-        "command": "echocode.printCtrlV",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+x",
-        "command": "echocode.printCtrlX",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+z",
-        "command": "echocode.printCtrlZ",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+y",
-        "command": "echocode.printCtrlY",
-        "when": "editorTextFocus"
-      }
+      { "key": "ctrl+a", "command": "echocode.shortcut.ctrla" },
+      { "key": "ctrl+b", "command": "echocode.shortcut.ctrlb" },
+      { "key": "ctrl+c", "command": "echocode.shortcut.ctrlc" },
+      { "key": "ctrl+d", "command": "echocode.shortcut.ctrld", "when": "editorFocus" },
+      { "key": "ctrl+e", "command": "echocode.shortcut.ctrle" },
+      { "key": "ctrl+f", "command": "echocode.shortcut.ctrlf", "when": "editorFocus || editorIsOpen" },
+      { "key": "ctrl+g", "command": "echocode.shortcut.ctrlg" },
+      { "key": "ctrl+h", "command": "echocode.shortcut.ctrlh" },
+      { "key": "ctrl+i", "command": "echocode.shortcut.ctrli", "when": "editorTextFocus && !editorReadonly" },
+      { "key": "ctrl+j", "command": "echocode.shortcut.ctrlj" },
+      { "key": "ctrl+k", "command": "echocode.shortcut.ctrlk" },
+      { "key": "ctrl+l", "command": "echocode.shortcut.ctrll" },
+      { "key": "ctrl+m", "command": "echocode.shortcut.ctrlm" },
+      { "key": "ctrl+n", "command": "echocode.shortcut.ctrln" },
+      { "key": "ctrl+o", "command": "echocode.shortcut.ctrlo" },
+      { "key": "ctrl+p", "command": "echocode.shortcut.ctrlp" },
+      { "key": "ctrl+q", "command": "echocode.shortcut.ctrlq" },
+      { "key": "ctrl+r", "command": "echocode.shortcut.ctrlr" },
+      { "key": "ctrl+s", "command": "echocode.shortcut.ctrls" },
+      { "key": "ctrl+t", "command": "echocode.shortcut.ctrlt" },
+      { "key": "ctrl+u", "command": "echocode.shortcut.ctrlu" },
+      { "key": "ctrl+v", "command": "echocode.shortcut.ctrlv" },
+      { "key": "ctrl+w", "command": "echocode.shortcut.ctrlw" },
+      { "key": "ctrl+x", "command": "echocode.shortcut.ctrlx" },
+      { "key": "ctrl+y", "command": "echocode.shortcut.ctrly" },
+      { "key": "ctrl+z", "command": "echocode.shortcut.ctrlz" },
+      { "key": "ctrl+tab", "command": "echocode.shortcut.ctrltab", "when": "!activeEditorGroupEmpty" },
+      { "key": "ctrl+shift+tab", "command": "echocode.shortcut.ctrlshifttab", "when": "!activeEditorGroupEmpty" },
+      { "key": "ctrl+`", "command": "echocode.shortcut.ctrl`", "when": "terminal.active" },
+      { "key": "ctrl+home", "command": "echocode.shortcut.ctrlhome", "when": "textInputFocus" },
+      { "key": "ctrl+end", "command": "echocode.shortcut.ctrlend", "when": "textInputFocus" },
+      { "key": "ctrl+left", "command": "echocode.shortcut.ctrlleft", "when": "textInputFocus && !accessibilityModeEnabled" },
+      { "key": "ctrl+right", "command": "echocode.shortcut.ctrlright", "when": "textInputFocus && !accessibilityModeEnabled" },
+      { "key": "ctrl+backspace", "command": "echocode.shortcut.ctrlbackspace", "when": "textInputFocus && !editorReadonly" },
+      { "key": "ctrl+delete", "command": "echocode.shortcut.ctrldelete", "when": "textInputFocus && !editorReadonly" },
+      { "key": "ctrl+shift+l", "command": "echocode.shortcut.ctrlshiftl", "when": "editorFocus" },
+      { "key": "ctrl+shift+k", "command": "echocode.shortcut.ctrlshiftk", "when": "textInputFocus && !editorReadonly" },
+      { "key": "ctrl+enter", "command": "echocode.shortcut.ctrlenter", "when": "editorTextFocus && !editorReadonly" },
+      { "key": "ctrl+shift+enter", "command": "echocode.shortcut.ctrlshiftenter", "when": "editorTextFocus && !editorReadonly" },
+      { "key": "ctrl+space", "command": "echocode.shortcut.ctrlspace", "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly && !suggestWidgetVisible" }
     ],
     "menus": {
       "view/item/context": [
@@ -177,9 +237,8 @@
   },
   "scripts": {
     "copy:data": "npx cpy src/data/**/* out/data --parents",
-    "update:keybindings": "node out/scripts/updateKeybindings.js",
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./ && npm run copy:data && npm run update:keybindings",
+    "compile": "tsc -p ./ && npm run copy:data",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
@@ -198,7 +257,5 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
-  "dependencies": {
-    "play-sound": "^1.1.6"
-  }
+  "dependencies": {}
 }
