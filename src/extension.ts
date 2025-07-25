@@ -2,9 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { SoundTreeDataProvider, SoundTreeItem } from './tree/soundView';
-import { RunSoundTreeDataProvider2, RunSoundTreeItem2, RunSoundType } from './tree/soundTerminal';
-import { exec } from 'child_process';
-import { buildKeybindingMap, runDefaultCommandsForKey } from './scripts/keybindingMapper';
+import { RunSoundTreeDataProvider2, RunSoundTreeItem2 } from './tree/soundTerminal';
 import { initializeTodo, getTasks, getMode, addTask, toggleTask, updateTask, moveTask, deleteTask, setMode, loadCustomReviewText } from './scripts/todo';
 
 let soundWebviewPanel: vscode.WebviewPanel | undefined;
@@ -258,27 +256,22 @@ export async function activate(context: vscode.ExtensionContext) {
 		}),
 
 		vscode.commands.registerCommand('echocode.addShortcut', async () => {
-			const keybindingsPath = path.join(context.extensionPath, 'src', 'data', 'defaultKeybindings.json');
 			const packagePath = path.join(context.extensionPath, 'package.json');
-
-			if (!fs.existsSync(keybindingsPath)) {
-				vscode.window.showErrorMessage('❌ Fichier defaultKeybindings.json introuvable.');
-				return;
-			}
 
 			if (!fs.existsSync(packagePath)) {
 				vscode.window.showErrorMessage('❌ Fichier package.json introuvable.');
 				return;
 			}
 
-			// Lecture des raccourcis autorisés depuis le package.json
-			let allowedShortcuts = new Set<string>();
+			// Lecture des raccourcis autorisés depuis package.json
+			let allowedShortcuts: string[] = [];
 			try {
 				const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
 				if (packageData?.contributes?.keybindings) {
-					packageData.contributes.keybindings.forEach((kb: any) => {
-						if (kb.key) {allowedShortcuts.add(kb.key.toLowerCase());}
-					});
+					allowedShortcuts = packageData.contributes.keybindings
+						.map((kb: any) => kb.key)
+						.filter((key: string | undefined) => typeof key === 'string' && key.trim() !== '')
+						.sort((a: string, b: string) => a.localeCompare(b, 'fr'));
 				}
 			} catch (e) {
 				vscode.window.showErrorMessage('❌ Erreur de parsing du package.json');
@@ -286,35 +279,13 @@ export async function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 
-			// Lecture des keybindings existants dans ton fichier par défaut
-			let parsed: any[];
-			try {
-				const rawData = fs.readFileSync(keybindingsPath, 'utf-8');
-				parsed = JSON.parse(rawData);
-			} catch (e) {
-				vscode.window.showErrorMessage('❌ Erreur de parsing du fichier defaultKeybindings.json');
-				console.error(e);
-				return;
-			}
-
-			// Filtrer uniquement les raccourcis autorisés ET existants
-			const allKeys = [...new Set(
-				parsed
-					.map(entry => entry.key)
-					.filter((key: string | undefined) =>
-						typeof key === 'string' &&
-						key.trim() !== '' &&
-						allowedShortcuts.has(key.toLowerCase())
-					)
-			)].sort((a, b) => a.localeCompare(b, 'fr'));
-
-			if (allKeys.length === 0) {
+			if (allowedShortcuts.length === 0) {
 				vscode.window.showWarningMessage('⚠️ Aucun raccourci défini dans le package.json.');
 				return;
 			}
 
 			// L'utilisateur choisit un raccourci parmi ceux autorisés
-			const shortcut = await vscode.window.showQuickPick(allKeys, {
+			const shortcut = await vscode.window.showQuickPick(allowedShortcuts, {
 				placeHolder: 'Choisissez un raccourci clavier (défini dans le package.json)'
 			});
 
@@ -350,6 +321,8 @@ export async function activate(context: vscode.ExtensionContext) {
 					volume: 1.0
 				});
 				vscode.window.showInformationMessage(`✅ Nouveau raccourci ajouté : ${shortcut}`);
+
+				vscode.window.showInformationMessage(`Si le son vient d'être importé, cliquez sur la To-Do List pour l'activer.`);
 			}
 		}),
 
