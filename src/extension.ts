@@ -259,47 +259,68 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		vscode.commands.registerCommand('echocode.addShortcut', async () => {
 			const keybindingsPath = path.join(context.extensionPath, 'src', 'data', 'defaultKeybindings.json');
+			const packagePath = path.join(context.extensionPath, 'package.json');
 
 			if (!fs.existsSync(keybindingsPath)) {
 				vscode.window.showErrorMessage('❌ Fichier defaultKeybindings.json introuvable.');
-				{return;}
+				return;
 			}
 
-			const rawData = fs.readFileSync(keybindingsPath, 'utf-8');
+			if (!fs.existsSync(packagePath)) {
+				vscode.window.showErrorMessage('❌ Fichier package.json introuvable.');
+				return;
+			}
+
+			// Lecture des raccourcis autorisés depuis le package.json
+			let allowedShortcuts = new Set<string>();
+			try {
+				const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+				if (packageData?.contributes?.keybindings) {
+					packageData.contributes.keybindings.forEach((kb: any) => {
+						if (kb.key) {allowedShortcuts.add(kb.key.toLowerCase());}
+					});
+				}
+			} catch (e) {
+				vscode.window.showErrorMessage('❌ Erreur de parsing du package.json');
+				console.error(e);
+				return;
+			}
+
+			// Lecture des keybindings existants dans ton fichier par défaut
 			let parsed: any[];
 			try {
+				const rawData = fs.readFileSync(keybindingsPath, 'utf-8');
 				parsed = JSON.parse(rawData);
 			} catch (e) {
 				vscode.window.showErrorMessage('❌ Erreur de parsing du fichier defaultKeybindings.json');
 				console.error(e);
-				{return;}
+				return;
 			}
 
+			// Filtrer uniquement les raccourcis autorisés ET existants
 			const allKeys = [...new Set(
 				parsed
 					.map(entry => entry.key)
-					.filter((key: string | undefined) => typeof key === 'string' && key.trim() !== '')
+					.filter((key: string | undefined) =>
+						typeof key === 'string' &&
+						key.trim() !== '' &&
+						allowedShortcuts.has(key.toLowerCase())
+					)
 			)].sort((a, b) => a.localeCompare(b, 'fr'));
 
-			allKeys.push('✏️ Entrer manuellement...');
-
-			const shortcutPick = await vscode.window.showQuickPick(allKeys, {
-				placeHolder: 'Choisissez un raccourci clavier'
-			});
-
-			let shortcut: string | undefined;
-			if (!shortcutPick) {return;}
-
-			if (shortcutPick === '✏️ Entrer manuellement...') {
-				shortcut = await vscode.window.showInputBox({
-					prompt: 'Entrez votre raccourci personnalisé (ex: Ctrl+Alt+M)'
-				});
-			} else {
-				shortcut = shortcutPick;
+			if (allKeys.length === 0) {
+				vscode.window.showWarningMessage('⚠️ Aucun raccourci défini dans le package.json.');
+				return;
 			}
+
+			// L'utilisateur choisit un raccourci parmi ceux autorisés
+			const shortcut = await vscode.window.showQuickPick(allKeys, {
+				placeHolder: 'Choisissez un raccourci clavier (défini dans le package.json)'
+			});
 
 			if (!shortcut) {return;}
 
+			// Liste des fichiers sons
 			const mediaFolder = path.join(context.extensionPath, 'media');
 			const files = fs.readdirSync(mediaFolder).filter(f =>
 				f.endsWith('.mp3') || f.endsWith('.wav') || f.endsWith('.ogg')
@@ -311,15 +332,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			if (!soundFile) {return;}
 
+			// Vérification si le raccourci existe déjà
 			const existing = soundTreeDataProvider.getShortcut(shortcut);
 			if (existing) {
 				if (existing.isVisible) {
 					vscode.window.showWarningMessage(`🔁 Le raccourci "${shortcut}" existe déjà et est actif.`);
 				} else {
-					/*if (shortcut.toLowerCase() === 'ctrl+f') {
-						vscode.window.showWarningMessage('❌ Impossible d\'assigner le raccourci "Ctrl+F".');
-						return;
-					}*/
 					soundTreeDataProvider.toggleVisibility(shortcut);
 					soundTreeDataProvider.updateSoundFile(shortcut, soundFile);
 					vscode.window.showInformationMessage(`✅ Raccourci "${shortcut}" activé avec ${soundFile}`);
