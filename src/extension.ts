@@ -160,7 +160,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	initializeTodo(context);
 
-	soundTreeDataProvider = new SoundTreeDataProvider();
+	const soundTreeDataProvider = new SoundTreeDataProvider();
 	vscode.window.registerTreeDataProvider('soundExplorer', soundTreeDataProvider);
 
 	const runSoundProvider = new RunSoundTreeDataProvider2();
