@@ -32,11 +32,7 @@ export class SoundTreeItem extends vscode.TreeItem {
       this.description = `${config.enabled ? '🔊' : '🔇'} • ${Math.round(config.volume * 100)}%`;
       this.contextValue = 'soundItem';
       this.iconPath = new vscode.ThemeIcon(config.enabled ? 'unmute' : 'mute');
-      this.command = {
-        command: 'echocode.playShortcutSound',
-        title: 'Play',
-        arguments: [this]
-      };
+      this.command = { command: 'echocode.playShortcutSound', title: 'Play', arguments: [this] };
     } else {
       this.contextValue = 'volumeControl';
       this.iconPath = new vscode.ThemeIcon(isVolumeControl === 'increase' ? 'add' : 'remove');
@@ -52,18 +48,14 @@ export class SoundTreeItem extends vscode.TreeItem {
 export class AddShortcutTreeItem extends vscode.TreeItem {
   constructor() {
     super('➕ Ajouter un raccourci', vscode.TreeItemCollapsibleState.None);
-    this.command = {
-      command: 'echocode.addShortcut',
-      title: 'Ajouter un raccourci'
-    };
+    this.command = { command: 'echocode.addShortcut', title: 'Ajouter un raccourci' };
     this.contextValue = 'addShortcut';
   }
 }
 
 export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined | void>();
+  private _onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
-
   private shortcuts: ShortcutConfig[] = [];
 
   constructor() {
@@ -80,14 +72,7 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
 
   getChildren(element?: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem[]> {
     if (!element) {
-      const items: vscode.TreeItem[] = [new AddShortcutTreeItem()];
-
-      for (const shortcut of this.shortcuts) {
-        if (shortcut.isVisible) {
-          items.push(new SoundTreeItem(shortcut.shortcut, shortcut));
-        }
-      }
-
+      const items = [new AddShortcutTreeItem(), ...this.shortcuts.filter(s => s.isVisible).map(s => new SoundTreeItem(s.shortcut, s))];
       return items;
     }
 
@@ -101,41 +86,30 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
     return [];
   }
 
-  toggleShortcut(shortcut: string) {
+  private updateShortcut(shortcut: string, updater: (s: ShortcutConfig) => void) {
     const found = this.shortcuts.find(s => s.shortcut === shortcut);
     if (found) {
-      found.enabled = !found.enabled;
+      updater(found);
       this.saveShortcuts();
       this.refresh();
     }
+  }
+
+  toggleShortcut(shortcut: string) {
+    this.updateShortcut(shortcut, s => (s.enabled = !s.enabled));
   }
 
   toggleVisibility(shortcut: string) {
-    const found = this.shortcuts.find(s => s.shortcut === shortcut);
-    if (found) {
-      found.isVisible = !found.isVisible;
-      this.saveShortcuts();
-      this.refresh();
-    }
+    this.updateShortcut(shortcut, s => (s.isVisible = !s.isVisible));
   }
 
   updateVolume(shortcut: string, newVolume: number) {
-    const found = this.shortcuts.find(s => s.shortcut === shortcut);
-    if (found) {
-      found.volume = Math.max(0, Math.min(1, newVolume));
-      this.saveShortcuts();
-      this.refresh();
-    }
+    this.updateShortcut(shortcut, s => (s.volume = Math.max(0, Math.min(1, newVolume))));
   }
 
   updateSoundFile(shortcut: string, newFile: string) {
-    const found = this.shortcuts.find(s => s.shortcut === shortcut);
-    if (found) {
-      found.soundFile = newFile;
-      this.saveShortcuts();
-      this.refresh();
-      vscode.window.showInformationMessage(`✅ Son mis à jour pour le raccourci "${shortcut}" : ${newFile}`);
-    }
+    this.updateShortcut(shortcut, s => (s.soundFile = newFile));
+    vscode.window.showInformationMessage(`✅ Son mis à jour pour le raccourci "${shortcut}" : ${newFile}`);
   }
 
   addShortcut(shortcut: string, config: Omit<ShortcutConfig, 'shortcut'>) {
@@ -145,40 +119,31 @@ export class SoundTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
   }
 
   removeShortcut(shortcut: string) {
-    const found = this.shortcuts.find(s => s.shortcut === shortcut);
-    if (found) {
-      found.isVisible = false;
-      this.saveShortcuts();
-      this.refresh();
-    }
+    this.updateShortcut(shortcut, s => (s.isVisible = false));
   }
 
   getShortcut(shortcut: string): ShortcutConfig | undefined {
     return this.shortcuts.find(s => s.shortcut === shortcut);
   }
 
-  getAllShortcuts(): { shortcut: string; config: Omit<ShortcutConfig, 'shortcut'> }[] {
+  getAllShortcuts() {
     return this.shortcuts.map(({ shortcut, ...config }) => ({ shortcut, config }));
   }
 
   private loadShortcuts() {
-    if (fs.existsSync(SHORTCUTS_FILE)) {
-      try {
-        const raw = fs.readFileSync(SHORTCUTS_FILE, 'utf-8');
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          this.shortcuts = parsed.map((s: any) => ({
-            ...s,
-            isVisible: typeof s.isVisible === 'boolean' ? s.isVisible : true
-          }));
-        } else {
-          console.error('❌ Format JSON invalide : attendu un tableau');
-          this.shortcuts = [];
-        }
-      } catch (error) {
-        console.error('❌ Erreur lors du chargement de shortcuts.json :', error);
-        this.shortcuts = [];
-      }
+    if (!fs.existsSync(SHORTCUTS_FILE)) {
+      this.shortcuts = [];
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(fs.readFileSync(SHORTCUTS_FILE, 'utf-8'));
+      this.shortcuts = Array.isArray(parsed)
+        ? parsed.map((s: any) => ({ ...s, isVisible: typeof s.isVisible === 'boolean' ? s.isVisible : true }))
+        : [];
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement de shortcuts.json :', error);
+      this.shortcuts = [];
     }
   }
 

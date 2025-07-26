@@ -1,7 +1,7 @@
 {
   "name": "echocode",
   "displayName": "EchoCode",
-  "description": "",
+  "description": "EchoCode ajoute des sons personnalisés à vos raccourcis et scripts dans VS Code.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.100.0"
@@ -47,37 +47,31 @@
       {
         "command": "echocode.toggleEnabled",
         "title": "Activer/Désactiver le son",
-        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.increaseVolume",
         "title": "Augmenter le volume",
-        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.decreaseVolume",
         "title": "Diminuer le volume",
-        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.changeSound",
         "title": "Changer le fichier son",
-        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.addShortcut",
         "title": "+ Ajouter un raccourci",
-        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
         "command": "echocode.removeShortcut",
         "title": "Supprimer le raccourci",
-        "when": "viewItem == soundExplorer",
         "category": "Sound Shortcut"
       },
       {
